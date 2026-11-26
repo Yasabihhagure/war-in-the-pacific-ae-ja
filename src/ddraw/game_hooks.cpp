@@ -174,6 +174,25 @@ const DataRange kRanges[] = {
     { 0x3159a88, 0x3b883c, { "places", "ground_units" } },         // wpl
 };
 
+// 調査用: 名前の対訳表にある文字列が、メモリのどこから渡されたかをログに残す
+// (64KB の区画と、その名前がある表の組み合わせごとに1回。ini [Debug] LogNameAddr=1)
+bool g_logNameAddr = false;
+void LogNameAddress(const char* s, int n) {
+    if (!g_logNameAddr) return;
+    static const char* const kinds[] = { "ships", "ship_classes", "places", "ground_units", "air_groups", "aircraft" };
+    int mask = 0;
+    for (int i = 0; i < 6; i++) if (LookupKind(kinds[i], s, n)) mask |= 1 << i;
+    if (!mask) return;
+    static std::unordered_map<unsigned long long, int> seen;
+    static int count = 0;
+    unsigned long long key = ((unsigned long long)((DWORD)s >> 16) << 8) | mask;
+    if (count >= 400 || seen.count(key)) return;
+    seen[key] = 1; count++;
+    std::string ks;
+    for (int i = 0; i < 6; i++) if (mask & (1 << i)) { if (!ks.empty()) ks += ','; ks += kinds[i]; }
+    LogLine("[addr] %p %s: %.*s", s, ks.c_str(), n, s);
+}
+
 const std::string* LookupAt(const char* s, int n) {
     DWORD a = (DWORD)s;
     for (const DataRange& r : kRanges) {
@@ -188,6 +207,7 @@ const std::string* LookupAt(const char* s, int n) {
         }
         break;
     }
+    LogNameAddress(s, n);
     return Lookup(s, n);
 }
 
@@ -633,6 +653,7 @@ void InstallGameHooks() {
     g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", -2, ini.c_str());
     g_jpYOffset = GetPrivateProfileIntA("JpFont", "YOffset", 0, ini.c_str());
     g_translateArgs = GetPrivateProfileIntA("Text", "TranslateArgs", 1, ini.c_str()) != 0;
+    g_logNameAddr = GetPrivateProfileIntA("Debug", "LogNameAddr", 1, ini.c_str()) != 0;
     InitializeCriticalSection(&g_argCs);
     struct Item { const char* name; DWORD addr; const char* bytes; int copy; void* hook; void** orig; };
     Item items[] = {
