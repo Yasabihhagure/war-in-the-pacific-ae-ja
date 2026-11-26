@@ -15,3 +15,10 @@ const std::string* Lookup(const char* s, int n);
 
 // game_hooks.cpp: exe 内部の関数をメモリ上で差し替える
 void InstallGameHooks();
+
+// display.cpp: ウィンドウモードの画面を拡大する
+void DisplayInit();
+void DisplayOnDirectDraw(void* dd);
+void* DisplayHookRegisterClassA(void* orig);
+void* DisplayHookCreateWindowExA(void* orig);
+void* DisplayPrimarySurface();

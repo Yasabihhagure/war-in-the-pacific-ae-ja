@@ -234,6 +234,13 @@ static void InstallHooks() {
         LogLine("[hook] %s!%s %s", e.dll, e.fn, ok ? "ok" : "FAILED");
         if (!ok) *e.orig = (void*)GetProcAddress(GetModuleHandleA(e.dll), e.fn);
     }
+    // ウィンドウモードの拡大 (display.cpp)
+    void* orig = nullptr;
+    if (PatchIAT(exe, "USER32.dll", "RegisterClassA", DisplayHookRegisterClassA(nullptr), &orig)) DisplayHookRegisterClassA(orig);
+    LogLine("[hook] USER32.dll!RegisterClassA %s", orig ? "ok" : "FAILED");
+    orig = nullptr;
+    if (PatchIAT(exe, "USER32.dll", "CreateWindowExA", DisplayHookCreateWindowExA(nullptr), &orig)) DisplayHookCreateWindowExA(orig);
+    LogLine("[hook] USER32.dll!CreateWindowExA %s", orig ? "ok" : "FAILED");
 }
 
 // ---------------------------------------------------------------- ddraw 転送
@@ -261,6 +268,16 @@ static void LoadReal() {
 #define DDSTUB(name) extern "C" __attribute__((naked, used)) void fwd_##name() { \
     __asm__ __volatile__("jmp *%0" :: "m"(p_##name)); }
 DDLIST(DDSTUB)
+
+// DirectDrawCreateEx だけは、作成後に IDirectDraw7 へ処理を差し込む (display.cpp)
+typedef HRESULT (WINAPI *DirectDrawCreateEx_t)(GUID*, void**, REFIID, void*);
+extern "C" HRESULT WINAPI my_DirectDrawCreateEx(GUID* guid, void** dd, REFIID iid, void* outer) {
+    if (!p_DirectDrawCreateEx) return E_FAIL;
+    HRESULT hr = ((DirectDrawCreateEx_t)p_DirectDrawCreateEx)(guid, dd, iid, outer);
+    LogLine("[ddraw] DirectDrawCreateEx hr=%08lX", hr);
+    if (hr == 0 && dd && *dd) DisplayOnDirectDraw(*dd);
+    return hr;
+}
 
 // ---------------------------------------------------------------- 表示スケール対策
 // Windows の表示スケール(125%/150%など)でゲーム画面が拡大されて切れるのを防ぐ。
@@ -293,6 +310,7 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
             SetDpiAware();
         LoadReal();
         LoadDict();
+        DisplayInit();
         InstallHooks();
         if (GetPrivateProfileIntA("Text", "GameHooks", 1, (std::string(g_dir) + "witpae_ja.ini").c_str()))
             InstallGameHooks();

@@ -9,7 +9,7 @@ EXPORTS
     DSoundHelp                  = fwd_DSoundHelp
     DirectDrawCreate            = fwd_DirectDrawCreate
     DirectDrawCreateClipper     = fwd_DirectDrawCreateClipper
-    DirectDrawCreateEx          = fwd_DirectDrawCreateEx
+    DirectDrawCreateEx          = my_DirectDrawCreateEx
     DirectDrawEnumerateA        = fwd_DirectDrawEnumerateA
     DirectDrawEnumerateExA      = fwd_DirectDrawEnumerateExA
     DirectDrawEnumerateExW      = fwd_DirectDrawEnumerateExW
