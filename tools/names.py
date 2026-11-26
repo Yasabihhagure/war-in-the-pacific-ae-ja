@@ -170,6 +170,10 @@ UNIT_RULES = {
         (_ORD + r" Troop Carrier Group", "第{0}輸送機群"),
         (_ORD + r" Photo Group", "第{0}写真偵察群"),
         (_ORD + r" Night Fighter Group", "第{0}夜戦群"),
+        (_ORD + r" BG", "第{0}爆撃群"),
+        (_ORD + r" FG", "第{0}戦闘機群"),
+        (_ORD + r" BS", "第{0}爆撃飛行隊"),
+        (_ORD + r" FS", "第{0}戦闘飛行隊"),
     ],
     "ground_units": [
         (_ORD + r" (?:Division|Div)", "第{0}師団"),
