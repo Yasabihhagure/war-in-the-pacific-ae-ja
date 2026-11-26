@@ -247,10 +247,37 @@ static HANDLE WINAPI h_CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSEC
             std::string alt = std::string(g_dir) + "witpae_ja\\SCEN\\" + base;
             DWORD a = GetFileAttributesA(alt.c_str());
             if (a != INVALID_FILE_ATTRIBUTES && !(a & FILE_ATTRIBUTE_DIRECTORY)) {
+                // ゲームの読み込み (fgets 80 バイト、幅 280px、空白でしか折り返さない) に合わせて
+                // 改行し直したものを witpae_ja\cache\ に書き、そちらを開く。失敗したら訳をそのまま開く
+                std::string src;
+                HANDLE r = o_CreateFileA(alt.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+                if (r != INVALID_HANDLE_VALUE) {
+                    DWORD size = GetFileSize(r, nullptr), got = 0;
+                    if (size != INVALID_FILE_SIZE && size < (1u << 20)) {
+                        src.resize(size);
+                        if (!ReadFile(r, &src[0], size, &got, nullptr)) got = 0;
+                        src.resize(got);
+                    }
+                    CloseHandle(r);
+                }
+                if (!src.empty()) {
+                    int width = GetPrivateProfileIntA("Text", "ScenWidth", 270, (std::string(g_dir) + "witpae_ja.ini").c_str());
+                    std::string wrapped = WrapScenText(src, width, 78);
+                    std::string dir2 = std::string(g_dir) + "witpae_ja\\cache";
+                    CreateDirectoryA(dir2.c_str(), nullptr);
+                    std::string tmp = dir2 + "\\" + base;
+                    HANDLE w = o_CreateFileA(tmp.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+                    if (w != INVALID_HANDLE_VALUE) {
+                        DWORD put = 0;
+                        BOOL ok = WriteFile(w, wrapped.data(), (DWORD)wrapped.size(), &put, nullptr);
+                        CloseHandle(w);
+                        if (ok && put == wrapped.size()) alt = tmp;
+                    }
+                }
                 HANDLE h = o_CreateFileA(alt.c_str(), access, share, sa, disp, flags, tmpl);
                 if (h != INVALID_HANDLE_VALUE) {
                     static int logged = 0;
-                    if (logged < 50) { logged++; LogLine("[scen] %s -> witpae_ja\\SCEN\\%s", name, base); }
+                    if (logged < 50) { logged++; LogLine("[scen] %s -> %s", name, alt.c_str()); }
                     return h;
                 }
             }

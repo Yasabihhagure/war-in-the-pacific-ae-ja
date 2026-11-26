@@ -15,6 +15,8 @@ const std::string* Lookup(const char* s, int n);
 
 // game_hooks.cpp: exe 内部の関数をメモリ上で差し替える
 void InstallGameHooks();
+// シナリオ説明の文 (CP932) を、幅 maxWidth px・1行 maxBytes バイト以内に改行し直す (改行は CRLF)
+std::string WrapScenText(const std::string& text, int maxWidth, int maxBytes);
 
 // display.cpp: ウィンドウモードの画面を拡大する
 void DisplayInit();

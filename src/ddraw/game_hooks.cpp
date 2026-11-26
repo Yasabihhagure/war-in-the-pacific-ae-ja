@@ -313,6 +313,53 @@ int __cdecl h_Wrap(const char* s, const char** starts, int* lens, int maxLines, 
 
 } // namespace
 
+// ---------------------------------------------------------------- シナリオ説明の行の整形
+// シナリオ説明の読み込み (0x61ef00 付近) は、fgets で最大 80 バイトずつ1行を読み、
+// 幅 280px (0x118) を超える行は strrchr(' ') で最後の空白を探して切り詰める。空白がなければ行を捨てる。
+// 日本語には空白がないので、ファイルを渡す前に、ここで幅と長さに収まるよう改行しておく。
+std::string WrapScenText(const std::string& text, int maxWidth, int maxBytes) {
+    void* font = (void*)0x3aebcd0; // 通常のフォント (PLAN.md 3.1)
+    int fh = FontHeight(font);
+    if (fh <= 0 || fh > 100 || ((int*)font)[0] != 128) font = *P_CURFONT;
+    std::string out;
+    size_t pos = 0;
+    while (pos < text.size()) {
+        size_t eol = text.find('\n', pos);
+        if (eol == std::string::npos) eol = text.size();
+        std::string line = text.substr(pos, eol - pos);
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        // 1行を、幅と長さに収まる部分に分ける
+        const char* s = line.c_str();
+        int n = (int)line.size(), i = 0;
+        do {
+            int start = i, width = 0, breakPos = -1, prev = -1;
+            bool prevDbcs = false;
+            int j = i;
+            while (j < n) {
+                BYTE c = (BYTE)s[j];
+                bool dbcs = c >= 0x80 && IsDBCSLeadByteEx(932, c) && j + 1 < n;
+                int step = dbcs ? 2 : 1;
+                int w = !font ? (dbcs ? 12 : 6) : dbcs ? SjisCharWidth(font, s + j) : (c >= 0x20 && c < 0x80 ? AsciiAdvance(font, c) : 0);
+                if (c == ' ') breakPos = j; // 空白の前で切る (空白は捨てる)
+                else if (prev >= 0 && (dbcs || prevDbcs) && !NoLineStart(s + j, dbcs) && !NoLineEnd(s + prev, prevDbcs))
+                    breakPos = j;           // j の前で切る
+                if (j > start && (width + w > maxWidth || j + step - start > maxBytes) && breakPos > start) break;
+                width += w;
+                if (c != ' ') { prev = j; prevDbcs = dbcs; }
+                j += step;
+            }
+            int end = j >= n ? n : breakPos;
+            out.append(s + start, end - start);
+            out += "\r\n";
+            i = end;
+            while (i < n && s[i] == ' ') i++; // 折り返した位置の空白は捨てる
+        } while (i < n);
+        if (eol >= text.size()) break;
+        pos = eol + 1;
+    }
+    return out;
+}
+
 // ---------------------------------------------------------------- 書式の差し替え
 // 引数の数が決まっていない関数 (sprintf など) は、スタック上の書式の引数だけを訳文に
 // 差し替えてから、元の関数 (の先頭を写した入口) へ飛ぶ。
