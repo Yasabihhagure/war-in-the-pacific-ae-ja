@@ -9,6 +9,8 @@
 #include "common.h"
 #include <cstring>
 #include <map>
+#include <unordered_map>
+#include <cstdint>
 
 namespace {
 
@@ -211,34 +213,116 @@ int __cdecl h_Width(const char* s, void* font) {
 //   0x7f13c0 (size, buf, fmt, va)  ゲーム側の書式組み立ての共通の入口 (sprintf/vsprintf 相当、
 //                                   ツールチップの登録 0x40d180 もここを通る)
 //   0x80f1ab (buf, fmt, ...)       C 標準ライブラリの sprintf (静的リンク、1479 か所から呼ばれる)
+//
+// あわせて、書式の %s に入る文字列 (文の断片や、艦名・地名などの名前) も対訳表で引き、
+// 訳があれば訳文を指すポインタに差し替える。%.20s のような上限があるときは、
+// 日本語の文字の途中で切れないよう、上限のバイト数に収めた訳文を渡す。
+// ファイル名を組み立てる書式 (.bmp や \ を含む) では、引数を差し替えない。
+namespace {
+bool g_translateArgs = true;
+CRITICAL_SECTION g_argCs;
+std::unordered_map<unsigned long long, std::string> g_truncCache; // (訳文のポインタ, 上限) -> 切り詰めた訳文
+
+bool IsFileFormat(const char* f) {
+    static const char* const ext[] = { ".bmp", ".BMP", ".wav", ".WAV", ".dat", ".txt", ".pws", ".avi",
+                                       ".ogg", ".csv", ".ini", ".cmt", ".sfx", ".SFX", ".prfs", ".db" };
+    if (strchr(f, '\\')) return true;
+    for (const char* e : ext) if (strstr(f, e)) return true;
+    return false;
+}
+
+// s の訳を引く。prec >= 0 なら、そのバイト数に収める (2バイト文字を途中で切らない)
+const char* LookupArg(const char* s, int prec) {
+    size_t n = strnlen(s, 1024);
+    if (n == 0 || n >= 1024) return nullptr;
+    const std::string* t = Lookup(s, (int)n);
+    if (!t) return nullptr;
+    if (prec < 0 || (int)t->size() <= prec) return t->c_str();
+    unsigned long long key = (unsigned long long)(uintptr_t)t * 1024 + (unsigned)prec;
+    EnterCriticalSection(&g_argCs);
+    auto it = g_truncCache.find(key);
+    if (it == g_truncCache.end()) {
+        int cut = 0;
+        while (cut < (int)t->size()) {
+            int step = IsDBCSLeadByteEx(932, (BYTE)(*t)[cut]) ? 2 : 1;
+            if (cut + step > prec) break;
+            cut += step;
+        }
+        it = g_truncCache.emplace(key, t->substr(0, cut)).first;
+    }
+    const char* r = it->second.c_str();
+    LeaveCriticalSection(&g_argCs);
+    return r;
+}
+
+// 書式 f をたどり、引数の並び ap の中の %s の文字列を訳文に差し替える
+void TranslateArgs(const char* f, char* ap) {
+    for (const char* p = f; *p; p++) {
+        if (*p != '%') continue;
+        p++;
+        if (*p == '%') continue;
+        while (*p && strchr("-+ #0", *p)) p++;
+        if (*p == '*') { ap += 4; p++; }
+        else while (*p >= '0' && *p <= '9') p++;
+        int prec = -1;
+        if (*p == '.') {
+            p++;
+            if (*p == '*') { prec = *(int*)ap; ap += 4; p++; }
+            else { prec = 0; while (*p >= '0' && *p <= '9') prec = prec * 10 + (*p++ - '0'); }
+        }
+        int size = 4;
+        if (p[0] == 'I' && p[1] == '6' && p[2] == '4') { size = 8; p += 3; }
+        else if (p[0] == 'l' && p[1] == 'l') { size = 8; p += 2; }
+        else if (*p == 'L') { size = 8; p++; }
+        else if (*p == 'h' || *p == 'l' || *p == 'w') p++;
+        char c = *p;
+        if (!c) break;
+        if (strchr("eEfgGaA", c)) size = 8;
+        if (c == 's') {
+            char** slot = (char**)ap;
+            if (*slot) {
+                if (const char* t = LookupArg(*slot, prec)) *slot = (char*)t;
+            }
+        }
+        ap += size;
+    }
+}
+} // namespace
+
 extern "C" {
 void* t_Vsn = nullptr;
 void* t_Sprintf = nullptr;
 
-const char* __cdecl TranslateFmt(const char* fmt) {
+// fmt を訳文の書式に差し替え、引数の %s も訳す。args は引数の並びの先頭 (va_list)
+const char* __cdecl TranslateFmtArgs(const char* fmt, char* args) {
     if (!fmt) return fmt;
     int n = (int)strlen(fmt);
     Seen("F", fmt, n);
-    if (const std::string* t = Lookup(fmt, n)) return t->c_str();
-    return fmt;
+    const char* f2 = fmt;
+    if (const std::string* t = Lookup(fmt, n)) f2 = t->c_str();
+    if (g_translateArgs && args && !IsFileFormat(fmt)) TranslateArgs(f2, args);
+    return f2;
 }
 
-// 入口では [esp]=戻り先、[esp+4]=size、[esp+8]=buf、[esp+12]=fmt
+// 入口では [esp]=戻り先、[esp+4]=size、[esp+8]=buf、[esp+12]=fmt、[esp+16]=va
 __attribute__((naked, used)) void s_Vsn() {
     __asm__ __volatile__(
-        "pushl 12(%esp)\n\t"
-        "call _TranslateFmt\n\t"
-        "addl $4, %esp\n\t"
+        "pushl 16(%esp)\n\t"        // va
+        "pushl 16(%esp)\n\t"        // fmt (1つ積んだので +4 ずれている)
+        "call _TranslateFmtArgs\n\t"
+        "addl $8, %esp\n\t"
         "movl %eax, 12(%esp)\n\t"
         "jmp *_t_Vsn\n\t");
 }
 
-// 入口では [esp]=戻り先、[esp+4]=buf、[esp+8]=fmt
+// 入口では [esp]=戻り先、[esp+4]=buf、[esp+8]=fmt、[esp+12]=可変長の引数の先頭
 __attribute__((naked, used)) void s_Sprintf() {
     __asm__ __volatile__(
-        "pushl 8(%esp)\n\t"
-        "call _TranslateFmt\n\t"
-        "addl $4, %esp\n\t"
+        "leal 12(%esp), %eax\n\t"   // 引数の並びの先頭
+        "pushl %eax\n\t"
+        "pushl 12(%esp)\n\t"        // fmt (1つ積んだので +4 ずれている)
+        "call _TranslateFmtArgs\n\t"
+        "addl $8, %esp\n\t"
         "movl %eax, 8(%esp)\n\t"
         "jmp *_t_Sprintf\n\t");
 }
@@ -251,6 +335,8 @@ void InstallGameHooks() {
     std::string ini = std::string(g_dir) + "witpae_ja.ini";
     g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", 0, ini.c_str());
     g_jpYOffset = GetPrivateProfileIntA("JpFont", "YOffset", 0, ini.c_str());
+    g_translateArgs = GetPrivateProfileIntA("Text", "TranslateArgs", 1, ini.c_str()) != 0;
+    InitializeCriticalSection(&g_argCs);
     struct Item { const char* name; DWORD addr; const char* bytes; int copy; void* hook; void** orig; };
     Item items[] = {
         // name       addr        先頭の機械語 (版の確認)         写す長さ  フック            元の関数への入口
