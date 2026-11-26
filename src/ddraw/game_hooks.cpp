@@ -168,7 +168,12 @@ bool HasSjisChar(const std::string& list, const char* p) {
 // 文字列がその範囲にあれば、どの種類の名前かが分かるので、その種類の対訳表を先に引く
 // (同じ英語名でも、艦は「川内」、地名は「仙台」のように訳し分ける)。
 struct DataRange { DWORD begin, size; const char* kinds[2]; };
+// ゲーム中の配列 (0x54b7c0 付近で初期化。範囲はログの [addr] で確かめた):
+//   艦船 0x1dad540 (0x8d9a00)、艦型 0x3aee328 (0x1cfde0)
+// 艦船の名前の一部は艦型の表にだけ訳がある (艦型と同じ名前は艦船の表で訳していない) ので、両方を引く
 const DataRange kRanges[] = {
+    { 0x1dad540, 0x8d9a00, { "ships", "ship_classes" } },         // 艦船 (ゲーム中)
+    { 0x3aee328, 0x1cfde0, { "ship_classes", "ships" } },         // 艦型 (ゲーム中)
     { 0x3cbe1a8, 0x583220, { "ships", nullptr } },                 // wps
     { 0x756c4a8, 0x152228, { "ship_classes", nullptr } },          // wpc
     { 0x3159a88, 0x3b883c, { "places", "ground_units" } },         // wpl
@@ -653,7 +658,7 @@ void InstallGameHooks() {
     g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", -2, ini.c_str());
     g_jpYOffset = GetPrivateProfileIntA("JpFont", "YOffset", 0, ini.c_str());
     g_translateArgs = GetPrivateProfileIntA("Text", "TranslateArgs", 1, ini.c_str()) != 0;
-    g_logNameAddr = GetPrivateProfileIntA("Debug", "LogNameAddr", 1, ini.c_str()) != 0;
+    g_logNameAddr = GetPrivateProfileIntA("Debug", "LogNameAddr", 0, ini.c_str()) != 0;
     InitializeCriticalSection(&g_argCs);
     struct Item { const char* name; DWORD addr; const char* bytes; int copy; void* hook; void** orig; };
     Item items[] = {
