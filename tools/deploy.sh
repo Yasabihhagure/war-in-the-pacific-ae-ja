@@ -7,6 +7,7 @@ cp "$W/src/ddraw/build/ddraw.dll" "$G/ddraw.dll"
 [ -f "$G/witpae_ja.ini" ] || cp "$W/witpae_ja.ini" "$G/witpae_ja.ini"
 mkdir -p "$G/witpae_ja/names"
 cp "$W/translation/ja.tsv" "$G/witpae_ja/ja.tsv"
+cp "$W/translation/unit_types.tsv" "$G/witpae_ja/unit_types.tsv"
 rm -f "$G/witpae_ja/strings.tsv"
 if ls "$W/translation/names/"*.tsv >/dev/null 2>&1; then cp "$W/translation/names/"*.tsv "$G/witpae_ja/names/"; fi
 # シナリオ説明の訳。書き出し先は既定（ゲームの witpae_ja\SCEN）に任せる。

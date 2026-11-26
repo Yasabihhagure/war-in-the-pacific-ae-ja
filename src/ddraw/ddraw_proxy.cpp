@@ -27,6 +27,8 @@ static std::unordered_set<std::string> g_seen;
 // 英文のハッシュ (FNV-1a 64bit) -> 訳文(CP932)
 // リポジトリに原作の英文を含めないため、辞書のキーはハッシュにしている
 static std::unordered_map<unsigned long long, std::string> g_dict;
+// 地上部隊の種類 (名前のあとに "%s %s" で付く語) の英文のハッシュ。witpae_ja\unit_types.tsv
+static std::unordered_set<unsigned long long> g_unitTypes;
 
 static unsigned long long Fnv1a64(const char* s, int n) {
     unsigned long long h = 0xcbf29ce484222325ULL;
@@ -125,6 +127,21 @@ static void LoadDict() {
         FindClose(h);
     }
     LogLine("[dict] total %u entries", (unsigned)g_dict.size());
+    // 地上部隊の種類 (key だけ使う)
+    FILE* f = nullptr;
+    if (fopen_s(&f, (dir + "unit_types.tsv").c_str(), "rb") == 0 && f) {
+        char buf[1024];
+        while (fgets(buf, sizeof buf, f))
+            if (buf[0] == 'h' && buf[1] == ':') g_unitTypes.insert(strtoull(buf + 2, nullptr, 16));
+        fclose(f);
+    }
+    LogLine("[dict] unit_types.tsv: %u entries", (unsigned)g_unitTypes.size());
+}
+
+bool IsUnitType(const char* s) {
+    if (!s || g_unitTypes.empty()) return false;
+    size_t n = strnlen(s, 64);
+    return n > 0 && n < 64 && g_unitTypes.count(Fnv1a64(s, (int)n)) != 0;
 }
 
 static void LoadIni() {

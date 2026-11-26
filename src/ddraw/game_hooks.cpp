@@ -10,6 +10,7 @@
 #include <cstring>
 #include <map>
 #include <unordered_map>
+#include <vector>
 #include <cstdint>
 
 namespace {
@@ -33,7 +34,9 @@ const DWORD FONT_BOLD2 = 0x4270ae8;
 
 // フォントの管理用データ
 inline int   FontHeight(void* f) { return ((int*)f)[2]; }         // +8
-inline DWORD FontColor(void* f)  { return ((DWORD*)f)[4]; }       // +0x10 (0x00RRGGBB)
+// +0x10 文字の色 (COLORREF と同じ 0x00BBGGRR。0x7f8c80 が白で文字画像を作り、0x7f6cd0 がこの色に塗り替える)
+// +0x14〜+0x1c は文字画像の塗り替えに使うほかの色 (0x7f3e60(font, 番号, 色) で設定)
+inline DWORD FontColor(void* f)  { return ((DWORD*)f)[4]; }
 inline bool  FontBold(void* f)   { return (DWORD)f == FONT_BOLD1 || (DWORD)f == FONT_BOLD2; }
 
 // ---------------------------------------------------------------- フックの道具
@@ -129,7 +132,7 @@ int DrawSjis(int x, int y, const char* s, int n, void* target, const RECT* clip)
     if (clip && clip->right > clip->left && clip->bottom > clip->top)
         IntersectClipRect(dc, clip->left, clip->top, clip->right, clip->bottom);
     SetBkMode(dc, TRANSPARENT);
-    SetTextColor(dc, RGB((c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff));
+    SetTextColor(dc, c & 0xFFFFFF);
     // 小さくした分の半分だけ下げて、英字の行の高さの中に収める
     int shrink = g_jpHeightAdjust < 0 ? -g_jpHeightAdjust / 2 : 0;
     TextOutW(dc, x, y + g_jpYOffset + shrink, w.c_str(), (int)w.size());
@@ -138,6 +141,25 @@ int DrawSjis(int x, int y, const char* s, int n, void* target, const RECT* clip)
     static int logged = 0;
     if (logged < 20) { logged++; LogLine("[jp] draw x=%d y=%d color=%06lX h=%d n=%d", x, y, c, FontHeight(font), n); }
     return width;
+}
+
+// UTF-8 の文字列を Shift_JIS (CP932) に直す (ソース中の日本語の定数用)
+std::string Sjis(const char* utf8) {
+    int wn = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, nullptr, 0);
+    std::wstring w(wn, 0);
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, &w[0], wn);
+    int an = WideCharToMultiByte(932, 0, w.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    std::string a(an, 0);
+    WideCharToMultiByte(932, 0, w.c_str(), -1, &a[0], an, nullptr, nullptr);
+    if (!a.empty() && a.back() == 0) a.pop_back();
+    return a;
+}
+
+// 全角文字だけを並べた list (Shift_JIS) に、p の2バイト文字があるか
+bool HasSjisChar(const std::string& list, const char* p) {
+    for (size_t i = 0; i + 1 < list.size(); i += 2)
+        if (p[0] == list[i] && p[1] == list[i + 1]) return true;
+    return false;
 }
 
 bool HasHigh(const char* s, int n) {
@@ -243,20 +265,17 @@ int SjisCharWidth(void* font, const char* p) {
 }
 
 // 行頭に置かない文字 (句読点、閉じ括弧、長音、小書きの仮名など)
+// ソースは UTF-8 なので、Shift_JIS の2バイト文字の並びに直してから比べる
 bool NoLineStart(const char* p, bool dbcs) {
     if (!dbcs) return strchr(")]},.:;!?%", *p) != nullptr && *p;
-    static const char* const list[] = { "、", "。", "，", "．", "・", "：", "；", "？", "！", "ー", "」", "』", "）", "】",
-        "〕", "｝", "〉", "》", "々", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ァ", "ィ", "ゥ", "ェ", "ォ",
-        "ッ", "ャ", "ュ", "ョ", "…", "％" };
-    for (const char* s : list) if (p[0] == s[0] && p[1] == s[1]) return true;
-    return false;
+    static const std::string list = Sjis(u8"、。，．・：；？！ー」』）】〕｝〉》々ぁぃぅぇぉっゃゅょァィゥェォッャュョ…％");
+    return HasSjisChar(list, p);
 }
 // 行末に置かない文字 (開き括弧)
 bool NoLineEnd(const char* p, bool dbcs) {
     if (!dbcs) return *p == '(' || *p == '[' || *p == '"';
-    static const char* const list[] = { "「", "『", "（", "【", "〔", "｛", "〈", "《" };
-    for (const char* s : list) if (p[0] == s[0] && p[1] == s[1]) return true;
-    return false;
+    static const std::string list = Sjis(u8"「『（【〔｛〈《");
+    return HasSjisChar(list, p);
 }
 
 int __cdecl h_Wrap(const char* s, const char** starts, int* lens, int maxLines, int len, int maxWidth, const char* brk) {
@@ -413,10 +432,19 @@ const char* LookupArg(const char* s, int prec) {
     return r;
 }
 
-// 書式 f をたどり、引数の並び ap の中の %s の文字列を訳文に差し替える
-void TranslateArgs(const char* f, char* ap) {
+// 書式の中の %s 1つ分の記録
+struct SArg {
+    const char* begin;  // 書式の中の '%' の位置
+    const char* end;    // 's' の次の位置
+    char** slot;        // 引数の置き場所
+    const char* orig;   // 差し替える前の文字列
+};
+
+// 書式 f をたどり、引数の並び ap の中の %s の文字列を訳文に差し替える。specs があれば %s の記録を入れる
+void TranslateArgs(const char* f, char* ap, std::vector<SArg>* specs = nullptr) {
     for (const char* p = f; *p; p++) {
         if (*p != '%') continue;
+        const char* begin = p;
         p++;
         if (*p == '%') continue;
         while (*p && strchr("-+ #0", *p)) p++;
@@ -438,12 +466,77 @@ void TranslateArgs(const char* f, char* ap) {
         if (strchr("eEfgGaA", c)) size = 8;
         if (c == 's') {
             char** slot = (char**)ap;
+            const char* orig = *slot;
             if (*slot) {
                 if (const char* t = LookupArg(*slot, prec)) *slot = (char*)t;
             }
+            if (specs) specs->push_back({ begin, p + 1, slot, orig });
         }
         ap += size;
     }
+}
+
+// ---------------------------------------------------------------- 地上部隊の名前のつなぎ方
+// 地上部隊の名前は「名前 %s 種類」(例 "%s %s" に "Kure 3rd" と "SNLF") で組み立てられる。
+// 名前が日本語に訳されていて、種類 (witpae_ja\unit_types.tsv) も日本語のとき:
+//   - 間の空白を詰める (呉第3 陸戦隊 → 呉第3陸戦隊)
+//   - 名前の訳がすでに種類を含んでいれば (隊・団・部・群で終わる、種類の訳で終わる、海軍・陸軍以外の「軍」で終わる)、
+//     種類を付けない (第10特別根拠地隊 根拠地隊 → 第10特別根拠地隊)
+std::unordered_map<std::string, std::string> g_joinFmts; // 空白を詰めた書式 (書式の文字列 + 位置 -> 新しい書式)
+
+bool EndsWith(const char* s, const char* t) {
+    size_t n = strlen(s), m = strlen(t);
+    if (m == 0 || m > n) return false;
+    if (memcmp(s + n - m, t, m) != 0) return false;
+    // 2バイト文字の途中から一致していないか確かめる
+    size_t i = 0;
+    while (i < n - m) i += IsDBCSLeadByteEx(932, (BYTE)s[i]) ? 2 : 1;
+    return i == n - m;
+}
+
+bool HasUnitWord(const char* name, const char* type) {
+    static const std::string words = Sjis(u8"隊団部群");
+    static const std::string gun = Sjis(u8"軍"), notGun = Sjis(u8"海陸空");
+    if (EndsWith(name, type)) return true;
+    size_t n = strlen(name);
+    if (n < 2) return false;
+    const char* last = name + n - 2;
+    if (!EndsWith(name, std::string(last, 2).c_str())) return false; // 最後が2バイト文字でない
+    if (HasSjisChar(words, last)) return true;
+    if (last[0] != gun[0] || last[1] != gun[1]) return false;
+    // 「軍」で終わる: 直前が 海・陸・空 (第1海軍 など、名前の一部) でなければ種類を含むとみなす
+    if (n >= 4 && EndsWith(name, std::string(last - 2, 4).c_str()) && HasSjisChar(notGun, last - 2)) return false;
+    return true;
+}
+
+// f2: 訳した書式。specs: TranslateArgs の記録。空白を詰めた書式を返す (変えなければ f2)
+const char* JoinUnitNames(const char* f2, std::vector<SArg>& specs) {
+    std::vector<int> cut; // 書式から消す空白の位置
+    for (size_t i = 0; i + 1 < specs.size(); i++) {
+        SArg& a = specs[i];
+        SArg& b = specs[i + 1];
+        if (a.end[0] != ' ' || a.end + 1 != b.begin) continue;
+        if (!a.orig || !b.orig || !IsUnitType(b.orig)) continue;
+        const char* name = *a.slot;
+        const char* type = *b.slot;
+        if (!name || !type || name == a.orig || type == b.orig) continue; // どちらかが訳されていない
+        if (!HasHigh(name, (int)strlen(name)) || !HasHigh(type, (int)strlen(type))) continue;
+        if (HasUnitWord(name, type)) *b.slot = (char*)"";
+        cut.push_back((int)(a.end - f2));
+    }
+    if (cut.empty()) return f2;
+    std::string key(f2);
+    for (int c : cut) { key += '\x01'; key += std::to_string(c); }
+    EnterCriticalSection(&g_argCs);
+    auto it = g_joinFmts.find(key);
+    if (it == g_joinFmts.end()) {
+        std::string s(f2);
+        for (size_t k = cut.size(); k-- > 0;) s.erase(cut[k], 1);
+        it = g_joinFmts.emplace(key, s).first;
+    }
+    const char* r = it->second.c_str();
+    LeaveCriticalSection(&g_argCs);
+    return r;
 }
 } // namespace
 
@@ -458,7 +551,11 @@ const char* __cdecl TranslateFmtArgs(const char* fmt, char* args) {
     Seen("F", fmt, n);
     const char* f2 = fmt;
     if (const std::string* t = Lookup(fmt, n)) f2 = t->c_str();
-    if (g_translateArgs && args && !IsFileFormat(fmt)) TranslateArgs(f2, args);
+    if (g_translateArgs && args && !IsFileFormat(fmt)) {
+        std::vector<SArg> specs;
+        TranslateArgs(f2, args, &specs);
+        if (specs.size() >= 2) f2 = JoinUnitNames(f2, specs);
+    }
     return f2;
 }
 
