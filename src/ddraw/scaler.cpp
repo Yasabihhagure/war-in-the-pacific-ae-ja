@@ -199,6 +199,55 @@ bool CanvasUpdate(void* surf, RECT sr, int gx, int gy) {
     return true;
 }
 
+// ゲームが主サーフェス (画面) から読み戻す転送の代わりに、キャンバスの (gx, gy) から w x h を
+// surf の dr.left, dr.top へ書き込む。ゲームは重ね絵 (ツールチップなど) を消すとき、
+// 画面から背景を読み戻す。拡大中は本物の主サーフェスに正しい絵がないため、写しから渡す。
+bool CanvasCopyTo(void* surf, RECT dr, int gx, int gy) {
+    if (!surf || g_cw <= 0 || !g_canvasValid) return false;
+    void** vt = *(void***)surf;
+    Desc d = {};
+    d.dwSize = sizeof d;
+    // DDLOCK_WAIT(1) | DDLOCK_WRITEONLY(0x20)
+    if (((Lock_t)vt[25])(surf, nullptr, &d, 0x21, nullptr) != 0 || !d.lpSurface) return false;
+    int sw = (int)d.dwWidth, sh = (int)d.dwHeight;
+    int w = dr.right - dr.left, h = dr.bottom - dr.top;
+    int dx = dr.left, dy = dr.top;
+    if (dx < 0) { gx -= dx; w += dx; dx = 0; }
+    if (dy < 0) { gy -= dy; h += dy; dy = 0; }
+    if (gx < 0) { dx -= gx; w += gx; gx = 0; }
+    if (gy < 0) { dy -= gy; h += gy; gy = 0; }
+    if (dx + w > sw) w = sw - dx;
+    if (dy + h > sh) h = sh - dy;
+    if (gx + w > g_cw) w = g_cw - gx;
+    if (gy + h > g_ch) h = g_ch - gy;
+    bool ok = true;
+    if (w > 0 && h > 0) {
+        BYTE* base = (BYTE*)d.lpSurface;
+        int rs = ShiftOf(d.rMask), gs = ShiftOf(d.gMask), bs = ShiftOf(d.bMask);
+        int rb = BitsOf(d.rMask), gb = BitsOf(d.gMask), bb = BitsOf(d.bMask);
+        for (int y = 0; y < h && ok; y++) {
+            BYTE* row = base + (size_t)(dy + y) * d.lPitch;
+            const uint32_t* s = &g_canvas[(size_t)(gy + y) * g_cw + gx];
+            if (d.bpp == 32) {
+                uint32_t* o = (uint32_t*)row + dx;
+                for (int x = 0; x < w; x++) o[x] = s[x];
+            } else if (d.bpp == 16) {
+                uint16_t* o = (uint16_t*)row + dx;
+                for (int x = 0; x < w; x++) {
+                    uint32_t c = s[x];
+                    uint32_t r = ((c >> 16) & 0xff) >> (8 - rb), g = ((c >> 8) & 0xff) >> (8 - gb), b = (c & 0xff) >> (8 - bb);
+                    o[x] = (uint16_t)((r << rs) | (g << gs) | (b << bs));
+                }
+            } else if (d.bpp == 24) {
+                BYTE* o = row + dx * 3;
+                for (int x = 0; x < w; x++) { o[x * 3] = (BYTE)s[x]; o[x * 3 + 1] = (BYTE)(s[x] >> 8); o[x * 3 + 2] = (BYTE)(s[x] >> 16); }
+            } else ok = false;
+        }
+    }
+    ((Unlock_t)vt[32])(surf, nullptr);
+    return ok;
+}
+
 // キャンバスのゲーム座標 (gx0,gy0)-(gx1,gy1) の周りを拡大し、窓の DC の (dx,dy) を基準に描く
 bool CanvasPresent(HDC wdc, int gx0, int gy0, int gx1, int gy1, int dx, int dy, int dw, int dh, bool smooth) {
     if (g_cw <= 0 || dw <= 0 || dh <= 0) return false;

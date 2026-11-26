@@ -226,6 +226,39 @@ static int WINAPI h_MessageBoxA(HWND w, LPCSTR text, LPCSTR cap, UINT f) {
     return o_MessageBoxA(w, t1 ? t1->c_str() : text, t2 ? t2->c_str() : cap, f);
 }
 
+// ---------------------------------------------------------------- シナリオ説明の txt の差し替え
+// ゲームが scen フォルダの .txt を読むとき、witpae_ja\SCEN\ に同じ名前の訳 (CP932) があればそちらを開く。
+typedef HANDLE (WINAPI *CreateFileA_t)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE);
+static CreateFileA_t o_CreateFileA;
+static bool g_replaceScen = true;
+
+static HANDLE WINAPI h_CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES sa,
+                                   DWORD disp, DWORD flags, HANDLE tmpl) {
+    if (g_replaceScen && name && disp == OPEN_EXISTING && !(access & GENERIC_WRITE)) {
+        size_t n = strlen(name);
+        const char* base = name + n;
+        while (base > name && base[-1] != '\\' && base[-1] != '/') base--;
+        // 直前のフォルダ名が scen で、拡張子が .txt
+        const char* dirEnd = base - 1;
+        const char* dir = dirEnd;
+        while (dir > name && dir[-1] != '\\' && dir[-1] != '/' && dir[-1] != ':') dir--;
+        bool isScen = base > name && dirEnd - dir == 4 && _strnicmp(dir, "scen", 4) == 0;
+        if (isScen && n > 4 && _stricmp(name + n - 4, ".txt") == 0) {
+            std::string alt = std::string(g_dir) + "witpae_ja\\SCEN\\" + base;
+            DWORD a = GetFileAttributesA(alt.c_str());
+            if (a != INVALID_FILE_ATTRIBUTES && !(a & FILE_ATTRIBUTE_DIRECTORY)) {
+                HANDLE h = o_CreateFileA(alt.c_str(), access, share, sa, disp, flags, tmpl);
+                if (h != INVALID_HANDLE_VALUE) {
+                    static int logged = 0;
+                    if (logged < 50) { logged++; LogLine("[scen] %s -> witpae_ja\\SCEN\\%s", name, base); }
+                    return h;
+                }
+            }
+        }
+    }
+    return o_CreateFileA(name, access, share, sa, disp, flags, tmpl);
+}
+
 // exe の IAT の1項目を書き換える
 static bool PatchIAT(HMODULE mod, const char* dll, const char* func, void* hook, void** orig) {
     BYTE* base = (BYTE*)mod;
@@ -266,7 +299,9 @@ static void InstallHooks() {
         {"GDI32.dll",  "GetTextExtentPoint32A", (void*)h_GetTextExtentPoint32A, (void**)&o_GetTextExtentPoint32A},
         {"USER32.dll", "SetDlgItemTextA",       (void*)h_SetDlgItemTextA,       (void**)&o_SetDlgItemTextA},
         {"USER32.dll", "MessageBoxA",           (void*)h_MessageBoxA,           (void**)&o_MessageBoxA},
+        {"KERNEL32.dll", "CreateFileA",         (void*)h_CreateFileA,           (void**)&o_CreateFileA},
     };
+    g_replaceScen = GetPrivateProfileIntA("Text", "ReplaceScenText", 1, (std::string(g_dir) + "witpae_ja.ini").c_str()) != 0;
     for (auto& e : t) {
         bool ok = PatchIAT(exe, e.dll, e.fn, e.hook, e.orig);
         LogLine("[hook] %s!%s %s", e.dll, e.fn, ok ? "ok" : "FAILED");

@@ -125,7 +125,9 @@ int DrawSjis(int x, int y, const char* s, int n, void* target) {
     HGDIOBJ old = SelectObject(dc, JpFont(font));
     SetBkMode(dc, TRANSPARENT);
     SetTextColor(dc, RGB((c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff));
-    TextOutW(dc, x, y + g_jpYOffset, w.c_str(), (int)w.size());
+    // 小さくした分の半分だけ下げて、英字の行の高さの中に収める
+    int shrink = g_jpHeightAdjust < 0 ? -g_jpHeightAdjust / 2 : 0;
+    TextOutW(dc, x, y + g_jpYOffset + shrink, w.c_str(), (int)w.size());
     SelectObject(dc, old);
     ((SurfReleaseDC_t)vt[0x68 / 4])(surf, dc);
     static int logged = 0;
@@ -175,7 +177,9 @@ void __cdecl h_DrawLine(int x, int y, const char* s, void* target, int color) {
         if (k > 0) {
             run.assign(p, k);
             o_DrawLine(cx, cy, run.c_str(), target, color);
-            cx = *P_X; cy = *P_Y;
+            // 元の関数は末尾の空白の分だけ位置を進めないことがあるので、幅を測って大きいほうを使う
+            int adv = cx + o_Width(run.c_str(), nullptr);
+            cx = *P_X > adv ? *P_X : adv; cy = *P_Y;
             p += k;
             continue;
         }
@@ -203,6 +207,89 @@ int __cdecl h_Width(const char* s, void* font) {
         p += k;
     }
     return w;
+}
+
+// ---------------------------------------------------------------- 折り返し
+// 0x7ed780 Wrap(str, char** starts, int* lens, int maxLines, int len, int maxWidth, const char* brk) -> 行数
+// 元の関数は空白でしか折り返さず、0x80 以上のバイトの幅を文字画像の表の外から読む。
+// 日本語を含み、maxWidth > 0、brk == 0 のときだけ、ここで折り返す (それ以外は元の関数)。
+// 元の関数の決まり (PLAN.md 3.1 参照):
+//   '\n' は印を立てるだけ。印のあとの '\r' と '~' は改行。印のない '\r' は空白として扱う。0x20 未満は無視。
+//   行の長さは「最後の空白でない文字」まで。次の行は折り返した位置の次のバイトから始まる。
+typedef int (__cdecl *Wrap_t)(const char*, const char**, int*, int, int, int, const char*);
+Wrap_t o_Wrap;
+const DWORD A_WRAP = 0x7ed780;
+
+std::unordered_map<unsigned long long, int> g_charWidth; // (フォント, 文字) -> 幅
+
+int AsciiAdvance(void* font, BYTE c) { return *(int*)((BYTE*)font + 0x824 + 28 * c); }
+
+int SjisCharWidth(void* font, const char* p) {
+    unsigned long long key = ((unsigned long long)(uintptr_t)font << 16) | ((BYTE)p[0] << 8) | (BYTE)p[1];
+    auto it = g_charWidth.find(key);
+    if (it != g_charWidth.end()) return it->second;
+    int w = MeasureSjis(font, p, 2);
+    g_charWidth[key] = w;
+    return w;
+}
+
+// 行頭に置かない文字 (句読点、閉じ括弧、長音、小書きの仮名など)
+bool NoLineStart(const char* p, bool dbcs) {
+    if (!dbcs) return strchr(")]},.:;!?%", *p) != nullptr && *p;
+    static const char* const list[] = { "、", "。", "，", "．", "・", "：", "；", "？", "！", "ー", "」", "』", "）", "】",
+        "〕", "｝", "〉", "》", "々", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ゃ", "ゅ", "ょ", "ァ", "ィ", "ゥ", "ェ", "ォ",
+        "ッ", "ャ", "ュ", "ョ", "…", "％" };
+    for (const char* s : list) if (p[0] == s[0] && p[1] == s[1]) return true;
+    return false;
+}
+// 行末に置かない文字 (開き括弧)
+bool NoLineEnd(const char* p, bool dbcs) {
+    if (!dbcs) return *p == '(' || *p == '[' || *p == '"';
+    static const char* const list[] = { "「", "『", "（", "【", "〔", "｛", "〈", "《" };
+    for (const char* s : list) if (p[0] == s[0] && p[1] == s[1]) return true;
+    return false;
+}
+
+int __cdecl h_Wrap(const char* s, const char** starts, int* lens, int maxLines, int len, int maxWidth, const char* brk) {
+    void* font = *P_CURFONT;
+    if (!s || len <= 0 || maxWidth <= 0 || brk || !font) return o_Wrap(s, starts, lens, maxLines, len, maxWidth, brk);
+    int n = (int)strnlen(s, (size_t)len);
+    if (!HasHigh(s, n)) return o_Wrap(s, starts, lens, maxLines, len, maxWidth, brk);
+
+    int count = 0, i = 0;
+    while (i < n && count < maxLines) {
+        int lineStart = i, width = 0, lastNormal = lineStart - 1, breakPos = -1, prev = -1; // prev: 直前の文字の先頭
+        bool prevDbcs = false, flag = false, forced = false, wrapped = false;
+        while (i < n) {
+            BYTE c = (BYTE)s[i];
+            if (c == '\n') { flag = true; i++; continue; }
+            if (c == '~' || (c == '\r' && flag)) { forced = true; i++; break; }
+            bool space = c == ' ' || c == '\r';
+            if (c < 0x20 && !space) { i++; continue; }
+            bool dbcs = c >= 0x80 && IsDBCSLeadByteEx(932, c) && i + 1 < n;
+            int step = dbcs ? 2 : 1;
+            if (space) {
+                if (lastNormal >= lineStart) breakPos = lastNormal;
+                width += AsciiAdvance(font, ' ');
+            } else {
+                // 日本語の文字の前後では、空白がなくても折り返せる
+                if (prev >= 0 && (dbcs || prevDbcs) && !NoLineStart(s + i, dbcs) && !NoLineEnd(s + prev, prevDbcs))
+                    breakPos = i - 1;
+                width += dbcs ? SjisCharWidth(font, s + i) : (c < 0x80 ? AsciiAdvance(font, c) : 0);
+                lastNormal = i + step - 1;
+                prev = i; prevDbcs = dbcs;
+            }
+            i += step;
+            if (width > maxWidth && breakPos >= lineStart) { i = breakPos + 1; wrapped = true; break; }
+        }
+        // 幅を超えて折り返したなら折り返し位置まで、改行や文の終わりなら最後の空白でない文字まで
+        int end = wrapped ? breakPos : lastNormal;
+        if (end < lineStart) end = lineStart; // 元の関数と同じく、空の行も長さ 1
+        starts[count] = s + lineStart;
+        lens[count] = end - lineStart + 1;
+        count++;
+    }
+    return count;
 }
 
 } // namespace
@@ -333,7 +420,7 @@ namespace {
 
 void InstallGameHooks() {
     std::string ini = std::string(g_dir) + "witpae_ja.ini";
-    g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", 0, ini.c_str());
+    g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", -2, ini.c_str());
     g_jpYOffset = GetPrivateProfileIntA("JpFont", "YOffset", 0, ini.c_str());
     g_translateArgs = GetPrivateProfileIntA("Text", "TranslateArgs", 1, ini.c_str()) != 0;
     InitializeCriticalSection(&g_argCs);
@@ -344,6 +431,7 @@ void InstallGameHooks() {
         {"Width",    A_WIDTH,    "558b6c2408",                      5,  (void*)h_Width,    (void**)&o_Width},
         {"Vsnprintf", A_VSNPRINT, "81ec1c0f0000",                   6,  (void*)s_Vsn,      &t_Vsn},
         {"sprintf",  A_SPRINTF,  "558bec83ec20",                    6,  (void*)s_Sprintf,  &t_Sprintf},
+        {"Wrap",     A_WRAP,     "83ec185333db",                    6,  (void*)h_Wrap,     (void**)&o_Wrap},
     };
     for (auto& it : items) {
         if (!CheckBytes(it.addr, it.bytes)) { LogLine("[game] %s: bytes mismatch, skipped (different exe version?)", it.name); continue; }

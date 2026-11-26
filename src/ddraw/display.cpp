@@ -264,7 +264,31 @@ void PatchSlot(void** vt, int idx, void* hook, void** orig) {
     VirtualProtect(&vt[idx], sizeof(void*), old, &old);
 }
 
+// 主サーフェス (画面) から読む転送を、キャンバス (ゲーム画面の写し) からの書き込みに置き換える。
+// sx, sy は画面の座標。成功したら true
+bool ReadFromPrimary(void* self, int dx, int dy, int sx, int sy, int w, int h) {
+    int ox = g_originKnown ? g_originX : *(int*)0xfdf9bfc;
+    int oy = g_originKnown ? g_originY : *(int*)0xfdf9c00;
+    EnsureCanvas();
+    bool ok = CanvasCopyTo(self, RECT{ dx, dy, dx + w, dy + h }, sx - ox, sy - oy);
+    static int logged = 0;
+    if (logged < 20) {
+        logged++;
+        LogLine("[display] read from primary %d,%d %dx%d -> game %d,%d -> surf %d,%d ok=%d", sx, sy, w, h, sx - ox, sy - oy, dx, dy, ok);
+    }
+    return ok;
+}
+
 HRESULT WINAPI h_Blt(void* self, RECT* dst, void* src, RECT* srcRect, DWORD flags, void* fx) {
+    if (g_active && g_hwnd && src && src == g_primary && self != g_primary) {
+        RECT s = srcRect ? *srcRect : RECT{ g_originX, g_originY, g_originX + g_gw, g_originY + g_gh };
+        RECT d = dst ? *dst : RECT{ 0, 0, s.right - s.left, s.bottom - s.top };
+        int w = s.right - s.left, h = s.bottom - s.top;
+        // 拡大・縮小なし、色キーなし (DDBLT_KEYSRC 0x8000 / KEYSRCOVERRIDE 0x10000) のときだけ置き換える
+        if (w == d.right - d.left && h == d.bottom - d.top && !(flags & 0x18000) &&
+            ReadFromPrimary(self, d.left, d.top, s.left, s.top, w, h))
+            return 0;
+    }
     if (!g_active || self != g_primary || !src || !g_hwnd)
         return o_Blt(self, dst, src, srcRect, flags, fx);
     g_bltCount++;
@@ -305,6 +329,10 @@ HRESULT WINAPI h_Blt(void* self, RECT* dst, void* src, RECT* srcRect, DWORD flag
 }
 
 HRESULT WINAPI h_BltFast(void* self, DWORD x, DWORD y, void* src, RECT* srcRect, DWORD flags) {
+    if (g_active && g_hwnd && src && src == g_primary && self != g_primary && !(flags & 0x3 /* SRCCOLORKEY|DESTCOLORKEY */)) {
+        RECT s = srcRect ? *srcRect : RECT{ g_originX, g_originY, g_originX + g_gw, g_originY + g_gh };
+        if (ReadFromPrimary(self, (int)x, (int)y, s.left, s.top, s.right - s.left, s.bottom - s.top)) return 0;
+    }
     if (g_active && self == g_primary) {
         static int logged = 0;
         if (logged < 5) { logged++; LogLine("[display] BltFast to primary (not scaled) x=%lu y=%lu", x, y); }

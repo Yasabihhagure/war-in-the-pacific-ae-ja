@@ -27,4 +27,5 @@ void* DisplayPrimarySurface();
 void CanvasResize(int w, int h);
 bool CanvasValid();
 bool CanvasUpdate(void* surf, RECT sr, int gx, int gy);
+bool CanvasCopyTo(void* surf, RECT dr, int gx, int gy);
 bool CanvasPresent(HDC wdc, int gx0, int gy0, int gx1, int gy1, int dx, int dy, int dw, int dh, bool smooth);

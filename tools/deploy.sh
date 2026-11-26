@@ -9,4 +9,5 @@ mkdir -p "$G/witpae_ja/names"
 cp "$W/translation/ja.tsv" "$G/witpae_ja/ja.tsv"
 rm -f "$G/witpae_ja/strings.tsv"
 if ls "$W/translation/names/"*.tsv >/dev/null 2>&1; then cp "$W/translation/names/"*.tsv "$G/witpae_ja/names/"; fi
+python "$W/tools/scen.py" build "$G/witpae_ja/SCEN"
 echo "deployed to $G"
