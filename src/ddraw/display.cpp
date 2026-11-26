@@ -29,7 +29,9 @@ int   g_fw = 0, g_fh = 0;  // 窓の枠の太さ (外側 - 中身)
 RECT  g_area = {};         // 窓を置く範囲 (作業領域、枠なしならモニター全体)
 bool  g_inFit = false;
 int   g_bltCount = 0;    // 主サーフェスへの Blt の回数
-void* g_backSurf = nullptr; // 主サーフェスへ全体を転送するときの転送元 (裏の画像)
+void* g_backSurf = nullptr;  // 主サーフェスへ全体を転送するときの転送元 (裏の画像)
+int   g_originX = 0, g_originY = 0; // ゲームが考えている窓の中身の左上 (画面の座標)
+bool  g_originKnown = false;
 HWND  g_hwnd = nullptr;
 WNDPROC g_origProc = nullptr;
 void* g_primary = nullptr;
@@ -105,25 +107,22 @@ void Stat(double ms, double getdcMs) {
     }
 }
 
-// 裏の画像の rect (ゲームの座標) を、窓の DC へ拡大して描く
-bool StretchFrom(void* src, HDC wdc, const RECT& r) {
-    // r は使わず、常に全体を描く (ゲームは全体を転送している)
-    (void)r;
-    if (!src) return false;
+// ゲーム画面の写し (キャンバス) のゲーム座標の範囲を、拡大して窓の DC に描く
+bool PresentRect(HDC wdc, int gx0, int gy0, int gx1, int gy1) {
     if (!g_qpf.QuadPart) { QueryPerformanceFrequency(&g_qpf); QueryPerformanceCounter(&g_statStart); }
     double t0 = NowMs();
     int dw = ToWinX(g_gw) - g_offX, dh = ToWinY(g_gh) - g_offY;
-    if (!ScalePresent(src, wdc, g_offX, g_offY, dw, dh, g_smooth)) {
-        // 読み出しに失敗したときは GDI で拡大する (遅い)
-        void** svt = *(void***)src;
-        HDC sdc = nullptr;
-        if (((GetDC_t)svt[17])(src, &sdc) != 0 || !sdc) return false;
-        SetStretchBltMode(wdc, COLORONCOLOR);
-        StretchBlt(wdc, g_offX, g_offY, dw, dh, sdc, 0, 0, g_gw, g_gh, SRCCOPY);
-        ((ReleaseDC_t)svt[26])(src, sdc);
-    }
+    bool ok = CanvasPresent(wdc, gx0, gy0, gx1, gy1, g_offX, g_offY, dw, dh, g_smooth);
     Stat(NowMs() - t0, 0);
-    return true;
+    return ok;
+}
+
+// キャンバスがまだ全体を持っていなければ、ゲームの画面の画像から全体を読む
+void EnsureCanvas() {
+    CanvasResize(g_gw, g_gh);
+    if (CanvasValid()) return;
+    void* src = g_backSurf ? g_backSurf : *(void**)0xfe7369c;
+    if (src) CanvasUpdate(src, RECT{ 0, 0, 0, 0 }, 0, 0);
 }
 
 void FitWindow();
@@ -156,15 +155,14 @@ LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             return 1;
         } else if (msg == WM_PAINT) {
             // 再描画はゲームに任せる (ゲームは主サーフェスへ Blt し、h_Blt で拡大される)。
-            // ゲームが Blt しなかったときだけ、裏の画像の全体を拡大して描く
+            // ゲームが Blt しなかったときだけ、写しの全体を拡大して描く
             if (GameSize()) FitWindow();
             int before = g_bltCount;
             LRESULT r = CallWindowProcA(g_origProc, h, msg, wp, lp);
             if (g_bltCount == before) {
-                void* src = g_backSurf ? g_backSurf : *(void**)0xfe7369c;
+                EnsureCanvas();
                 HDC dc = GetDC(h);
-                RECT all = { 0, 0, g_gw, g_gh };
-                StretchFrom(src, dc, all);
+                PresentRect(dc, 0, 0, g_gw, g_gh);
                 ReleaseDC(h, dc);
                 ValidateRect(h, nullptr);
             }
@@ -272,19 +270,35 @@ HRESULT WINAPI h_Blt(void* self, RECT* dst, void* src, RECT* srcRect, DWORD flag
     g_bltCount++;
     if (GameSize()) FitWindow();
     RECT r = srcRect ? *srcRect : RECT{ 0, 0, g_gw, g_gh };
-    RECT d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
+    int rw = r.right - r.left, rh = r.bottom - r.top;
+
+    // 転送先 (画面の座標) から、ゲーム画面の中の位置を求める。
+    // 全体の転送で、ゲームが考えている窓の中身の左上 (origin) を覚えておく。
+    bool full = rw == g_gw && rh == g_gh;
+    if (dst && full) { g_originX = dst->left - r.left; g_originY = dst->top - r.top; g_originKnown = true; g_backSurf = src; }
+    int ox = g_originKnown ? g_originX : *(int*)0xfdf9bfc;
+    int oy = g_originKnown ? g_originY : *(int*)0xfdf9c00;
+    int gx = dst ? dst->left - ox : r.left;
+    int gy = dst ? dst->top - oy : r.top;
+
     static int logged = 0;
-    if (logged < 5 || (logged < 50 && (r.right - r.left) != g_gw)) { logged++; LogLine("[display] Blt src=%ld,%ld-%ld,%ld flags=%lX", r.left, r.top, r.right, r.bottom, flags); }
-    if (r.right > g_gw) r.right = g_gw;
-    if (r.bottom > g_gh) r.bottom = g_gh;
-    if (r.left == 0 && r.top == 0 && r.right == g_gw && r.bottom == g_gh) g_backSurf = src;
-    {
-        HDC wdc = GetDC(g_hwnd);
-        bool ok = StretchFrom(src, wdc, r);
-        ReleaseDC(g_hwnd, wdc);
-        if (ok) return 0;
+    if (logged < 5 || (logged < 60 && !full)) {
+        logged++;
+        LogLine("[display] Blt src=%ld,%ld-%ld,%ld dst=%ld,%ld-%ld,%ld origin=%d,%d (game %d,%d) -> game %d,%d flags=%lX",
+                r.left, r.top, r.right, r.bottom,
+                dst ? dst->left : -1, dst ? dst->top : -1, dst ? dst->right : -1, dst ? dst->bottom : -1,
+                ox, oy, *(int*)0xfdf9bfc, *(int*)0xfdf9c00, gx, gy, flags);
     }
-    d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
+
+    EnsureCanvas();
+    if (CanvasUpdate(src, r, gx, gy)) {
+        HDC wdc = GetDC(g_hwnd);
+        PresentRect(wdc, gx, gy, gx + rw, gy + rh);
+        ReleaseDC(g_hwnd, wdc);
+        return 0;
+    }
+    // 読み出しに失敗したときは、DirectDraw に拡大させる (粗い)
+    RECT d = { ToWinX(gx), ToWinY(gy), ToWinX(gx + rw), ToWinY(gy + rh) };
     POINT o = { 0, 0 }; ClientToScreen(g_hwnd, &o);
     OffsetRect(&d, o.x, o.y);
     return o_Blt(self, &d, src, &r, flags, fx);

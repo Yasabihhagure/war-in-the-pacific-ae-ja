@@ -23,5 +23,8 @@ void* DisplayHookRegisterClassA(void* orig);
 void* DisplayHookCreateWindowExA(void* orig);
 void* DisplayPrimarySurface();
 
-// scaler.cpp: 裏の画像を読み出して自前で拡大し、窓へ描く
-bool ScalePresent(void* surf, HDC wdc, int dx, int dy, int dw, int dh, bool smooth);
+// scaler.cpp: ゲーム画面の写し (キャンバス) を持ち、自前で拡大して窓へ描く
+void CanvasResize(int w, int h);
+bool CanvasValid();
+bool CanvasUpdate(void* surf, RECT sr, int gx, int gy);
+bool CanvasPresent(HDC wdc, int gx0, int gy0, int gx1, int gy1, int dx, int dy, int dw, int dh, bool smooth);
