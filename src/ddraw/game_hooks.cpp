@@ -15,7 +15,8 @@
 namespace {
 
 // ---------------------------------------------------------------- exe のアドレス
-const DWORD A_DRAWLINE = 0x7fa920; // void (int x, int y, const char* s, IDirectDrawSurface7* target, int color)
+const DWORD A_DRAWLINE = 0x7fa920; // void (int x, int y, const char* s, IDirectDrawSurface7* target, RECT* clip)
+const RECT* const P_SCREENCLIP = (const RECT*)0xfe732ac; // clip が空で描く先が画面のときの切り抜き範囲 (0x7fa330)
 const DWORD A_WIDTH    = 0x7f43e0; // int  (const char* s, Font* font)
 const DWORD A_VSNPRINT = 0x7f13c0; // int  (int size, char* buf, const char* fmt, va_list va)
 const DWORD A_SPRINTF  = 0x80f1ab; // int  (char* buf, const char* fmt, ...)  C 標準ライブラリ
@@ -111,7 +112,8 @@ typedef HRESULT (__stdcall *SurfGetDC_t)(void*, HDC*);
 typedef HRESULT (__stdcall *SurfReleaseDC_t)(void*, HDC);
 
 // 描画先サーフェスの DC に日本語を描き、幅を返す
-int DrawSjis(int x, int y, const char* s, int n, void* target) {
+// clip: 切り抜く範囲 (0x7fa330 と同じ決まり。空で描く先が画面なら P_SCREENCLIP、それ以外の空はサーフェス全体)
+int DrawSjis(int x, int y, const char* s, int n, void* target, const RECT* clip) {
     void* font = *P_CURFONT;
     if (!font) return 0;
     void* surf = target ? target : *P_SCREEN;
@@ -123,6 +125,9 @@ int DrawSjis(int x, int y, const char* s, int n, void* target) {
     std::wstring w = ToWide(s, n);
     DWORD c = FontColor(font);
     HGDIOBJ old = SelectObject(dc, JpFont(font));
+    if (!clip && surf == *P_SCREEN) clip = P_SCREENCLIP;
+    if (clip && clip->right > clip->left && clip->bottom > clip->top)
+        IntersectClipRect(dc, clip->left, clip->top, clip->right, clip->bottom);
     SetBkMode(dc, TRANSPARENT);
     SetTextColor(dc, RGB((c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff));
     // 小さくした分の半分だけ下げて、英字の行の高さの中に収める
@@ -156,18 +161,18 @@ int LowRunLen(const char* s) {
 }
 
 // ---------------------------------------------------------------- フック本体
-typedef void (__cdecl *DrawLine_t)(int, int, const char*, void*, int);
+typedef void (__cdecl *DrawLine_t)(int, int, const char*, void*, RECT*);
 typedef int  (__cdecl *Width_t)(const char*, void*);
 
 DrawLine_t o_DrawLine;
 Width_t    o_Width;
 
-void __cdecl h_DrawLine(int x, int y, const char* s, void* target, int color) {
-    if (!s || !*P_READY || !*P_CURFONT) { o_DrawLine(x, y, s, target, color); return; }
+void __cdecl h_DrawLine(int x, int y, const char* s, void* target, RECT* clip) {
+    if (!s || !*P_READY || !*P_CURFONT) { o_DrawLine(x, y, s, target, clip); return; }
     int n = (int)strlen(s);
     Seen("L", s, n);
     if (const std::string* t = Lookup(s, n)) { s = t->c_str(); n = (int)t->size(); }
-    if (!HasHigh(s, n)) { o_DrawLine(x, y, s, target, color); return; }
+    if (!HasHigh(s, n)) { o_DrawLine(x, y, s, target, clip); return; }
 
     int cx = x, cy = y;
     std::string run;
@@ -176,7 +181,7 @@ void __cdecl h_DrawLine(int x, int y, const char* s, void* target, int color) {
         int k = LowRunLen(p);
         if (k > 0) {
             run.assign(p, k);
-            o_DrawLine(cx, cy, run.c_str(), target, color);
+            o_DrawLine(cx, cy, run.c_str(), target, clip);
             // 元の関数は末尾の空白の分だけ位置を進めないことがあるので、幅を測って大きいほうを使う
             int adv = cx + o_Width(run.c_str(), nullptr);
             cx = *P_X > adv ? *P_X : adv; cy = *P_Y;
@@ -184,7 +189,7 @@ void __cdecl h_DrawLine(int x, int y, const char* s, void* target, int color) {
             continue;
         }
         k = HighRunLen(p);
-        cx += DrawSjis(cx, cy, p, k, target);
+        cx += DrawSjis(cx, cy, p, k, target, clip);
         *P_X = cx; *P_Y = cy;
         p += k;
     }
