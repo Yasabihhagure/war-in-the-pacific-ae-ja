@@ -4,9 +4,12 @@
 // - ゲームが裏の画像を窓へ転送するとき (主サーフェスへの Blt) に、拡大して転送する
 // - 窓に届くマウスの座標を倍率で割って、ゲームに渡す
 //
-// ゲームの描画は 1024x768 のまま。ゲームから見ると、拡大されていない窓に見える。
+// ゲームの描画の大きさは変えない (ウィンドウモードでは起動直後 800x600、その後 1024x768 など)。
+// ゲームの解像度は [0x886a58] (幅) と [0x886a5c] (高さ) から読む。
+// ゲームは WM_GETMINMAXINFO で窓の大きさを解像度+枠に固定するので、その制限を外す。
 #include "common.h"
 #include <cmath>
+#include <cstring>
 
 namespace {
 
@@ -15,15 +18,30 @@ bool  g_enable = true;     // Scale: 0 で無効
 double g_scaleCfg = 0;     // Scale: 0=自動 (画面に収まる最大), それ以外は倍率
 bool  g_borderless = false;
 bool  g_smooth = true;
-int   g_gw = 1024, g_gh = 768; // ゲームの画面の大きさ
+int   g_gw = 1024, g_gh = 768; // ゲームの画面の大きさ (GameSize() で更新)
+int   g_defW = 1024, g_defH = 768; // 読めないときの既定値 (ini の GameWidth/GameHeight)
+int* const P_GAME_W = (int*)0x886a58;
+int* const P_GAME_H = (int*)0x886a5c;
 
 // 状態
 bool  g_active = false;    // 拡大中
+int   g_fw = 0, g_fh = 0;  // 窓の枠の太さ (外側 - 中身)
+RECT  g_area = {};         // 窓を置く範囲 (作業領域、枠なしならモニター全体)
+bool  g_inFit = false;
 HWND  g_hwnd = nullptr;
 WNDPROC g_origProc = nullptr;
 void* g_primary = nullptr;
 double g_scale = 1.0;
 int   g_offX = 0, g_offY = 0;  // 窓の中の、拡大した画像の左上 (左右・上下の余白)
+
+// ゲームの解像度を読む。変わっていたら true
+bool GameSize() {
+    int w = *P_GAME_W, h = *P_GAME_H;
+    if (w < 320 || w > 4096 || h < 200 || h > 4096) { w = g_defW; h = g_defH; }
+    if (w == g_gw && h == g_gh) return false;
+    g_gw = w; g_gh = h;
+    return true;
+}
 
 // ---------------------------------------------------------------- 座標の変換
 void Recalc() {
@@ -41,6 +59,19 @@ int ToGameY(int y) { int v = (int)floor((y - g_offY) / g_scale); return v < 0 ? 
 int ToWinX(int x) { return g_offX + (int)lround(x * g_scale); }
 int ToWinY(int y) { return g_offY + (int)lround(y * g_scale); }
 
+// 起動オプションにウィンドウモード (-w, -wd, -ww) があるか
+bool HasWindowedSwitch() {
+    const char* c = GetCommandLineA();
+    for (const char* p = c; (p = strstr(p, "-w")) != nullptr; p += 2) {
+        bool startOk = (p == c) || p[-1] == ' ' || p[-1] == '	' || p[-1] == '"';
+        char n = p[2];
+        bool endOk = n == 0 || n == ' ' || n == '	' || n == '"' ||
+                     ((n == 'd' || n == 'w') && (p[3] == 0 || p[3] == ' ' || p[3] == '	' || p[3] == '"'));
+        if (startOk && endOk) return true;
+    }
+    return false;
+}
+
 // ---------------------------------------------------------------- 窓のメッセージ
 LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     if (g_active && h == g_hwnd) {
@@ -53,6 +84,14 @@ LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             ScreenToClient(h, &p);
             POINT o = { 0, 0 }; ClientToScreen(h, &o);
             lp = MAKELPARAM(o.x + ToGameX(p.x), o.y + ToGameY(p.y));
+        } else if (msg == WM_GETMINMAXINFO) {
+            // ゲームの処理 (窓を解像度+枠に固定する) のあとで、制限を外す
+            LRESULT r = CallWindowProcA(g_origProc, h, msg, wp, lp);
+            MINMAXINFO* mm = (MINMAXINFO*)lp;
+            mm->ptMinTrackSize.x = 320; mm->ptMinTrackSize.y = 240;
+            mm->ptMaxTrackSize.x = GetSystemMetrics(SM_CXVIRTUALSCREEN) + g_fw;
+            mm->ptMaxTrackSize.y = GetSystemMetrics(SM_CYVIRTUALSCREEN) + g_fh;
+            return r;
         } else if (msg == WM_SIZE) {
             Recalc();
         } else if (msg == WM_ERASEBKGND) {
@@ -62,6 +101,30 @@ LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
         }
     }
     return CallWindowProcA(g_origProc, h, msg, wp, lp);
+}
+
+// 窓の大きさを、今のゲームの解像度に合わせて画面に収まる最大にする
+void FitWindow() {
+    if (!g_hwnd || g_inFit) return;
+    g_inFit = true;
+    int aw = g_area.right - g_area.left, ah = g_area.bottom - g_area.top;
+    int cw, ch;
+    if (g_borderless) { cw = aw; ch = ah; }
+    else {
+        double s = g_scaleCfg > 0 ? g_scaleCfg
+                                  : (std::min)((double)(aw - g_fw) / g_gw, (double)(ah - g_fh) / g_gh);
+        if (s < 1.0) s = 1.0;
+        cw = (int)floor(g_gw * s); ch = (int)floor(g_gh * s);
+    }
+    int nw = cw + g_fw, nh = ch + g_fh;
+    int nx = g_area.left + (aw - nw) / 2, ny = g_area.top + (ah - nh) / 2;
+    if (ny < g_area.top) ny = g_area.top;
+    SetWindowPos(g_hwnd, nullptr, nx, ny, nw, nh, SWP_NOZORDER | SWP_NOACTIVATE);
+    Recalc();
+    RECT cr; GetClientRect(g_hwnd, &cr);
+    LogLine("[display] fit game=%dx%d scale=%.3f client=%ldx%ld frame=%dx%d off=%d,%d borderless=%d",
+            g_gw, g_gh, g_scale, cr.right, cr.bottom, g_fw, g_fh, g_offX, g_offY, g_borderless);
+    g_inFit = false;
 }
 
 // ---------------------------------------------------------------- IAT フック
@@ -82,16 +145,11 @@ ATOM WINAPI h_RegisterClassA(const WNDCLASSA* wc) {
 HWND WINAPI h_CreateWindowExA(DWORD ex, LPCSTR cls, LPCSTR title, DWORD style, int x, int y, int w, int h,
                               HWND parent, HMENU menu, HINSTANCE inst, LPVOID param) {
     LogLine("[display] CreateWindowExA ex=%lX style=%lX x=%d y=%d w=%d h=%d", ex, style, x, y, w, h);
-    bool windowed = (style & WS_CAPTION) == WS_CAPTION;
-    if (!g_enable || !windowed || g_hwnd || parent) {
-        HWND r = o_CreateWindowExA(ex, cls, title, style, x, y, w, h, parent, menu, inst, param);
-        return r;
-    }
-    // ゲームの画面の大きさ = 指定された窓の大きさから枠を引いたもの
-    RECT adj = { 0, 0, 0, 0 };
-    AdjustWindowRectEx(&adj, style, FALSE, ex);
-    int gw = w - (adj.right - adj.left), gh = h - (adj.bottom - adj.top);
-    if (gw >= 320 && gh >= 240) { g_gw = gw; g_gh = gh; }
+    // 全画面用 (WS_POPUP) でなければウィンドウモード。
+    // ゲームの窓は WS_CAPTION のビットを持たない (0x100F0000) が、Windows がタイトルバーをつける。
+    bool windowed = (style & WS_POPUP) == 0 && HasWindowedSwitch();
+    if (!g_enable || !windowed || g_hwnd || parent)
+        return o_CreateWindowExA(ex, cls, title, style, x, y, w, h, parent, menu, inst, param);
 
     POINT pt = { x, y };
     HMONITOR mon = MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
@@ -101,32 +159,22 @@ HWND WINAPI h_CreateWindowExA(DWORD ex, LPCSTR cls, LPCSTR title, DWORD style, i
     int aw = area.right - area.left, ah = area.bottom - area.top;
 
     DWORD nstyle = style, nex = ex;
-    int fw = 0, fh = 0;
     if (g_borderless) {
         nstyle = (style & ~(WS_CAPTION | WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | WS_POPUP;
         nex = ex & ~(WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_DLGMODALFRAME);
-    } else {
-        RECT a2 = { 0, 0, 0, 0 };
-        AdjustWindowRectEx(&a2, nstyle, FALSE, nex);
-        fw = a2.right - a2.left; fh = a2.bottom - a2.top;
     }
-    double s = g_scaleCfg > 0 ? g_scaleCfg
-                              : (std::min)((double)(aw - fw) / g_gw, (double)(ah - fh) / g_gh);
-    if (s < 1.0) s = 1.0;
-    int cw, ch;
-    if (g_borderless) { cw = aw; ch = ah; }
-    else { cw = (int)lround(g_gw * s); ch = (int)lround(g_gh * s); }
-    int nw = cw + fw, nh = ch + fh;
-    int nx = area.left + (aw - nw) / 2, ny = area.top + (ah - nh) / 2;
-    if (ny < area.top) ny = area.top;
-    HWND r = o_CreateWindowExA(nex, cls, title, nstyle, nx, ny, nw, nh, parent, menu, inst, param);
-    if (r) {
-        g_hwnd = r;
-        g_active = true;
-        Recalc();
-        LogLine("[display] scaled window game=%dx%d scale=%.3f client=%dx%d off=%d,%d borderless=%d",
-                g_gw, g_gh, g_scale, cw, ch, g_offX, g_offY, g_borderless);
-    }
+    // まず仮の大きさで作り、枠の太さを実測する
+    HWND r = o_CreateWindowExA(nex, cls, title, nstyle, area.left, area.top, aw, ah, parent, menu, inst, param);
+    if (!r) return r;
+    RECT wr, cr;
+    GetWindowRect(r, &wr); GetClientRect(r, &cr);
+    int fw = (wr.right - wr.left) - cr.right, fh = (wr.bottom - wr.top) - cr.bottom;
+
+    g_fw = fw; g_fh = fh; g_area = area;
+    g_hwnd = r;
+    g_active = true;
+    GameSize();
+    FitWindow();
     return r;
 }
 
@@ -152,10 +200,11 @@ void PatchSlot(void** vt, int idx, void* hook, void** orig) {
 HRESULT WINAPI h_Blt(void* self, RECT* dst, void* src, RECT* srcRect, DWORD flags, void* fx) {
     if (!g_active || self != g_primary || !src || !g_hwnd)
         return o_Blt(self, dst, src, srcRect, flags, fx);
+    if (GameSize()) FitWindow();
     RECT r = srcRect ? *srcRect : RECT{ 0, 0, g_gw, g_gh };
     RECT d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
     static int logged = 0;
-    if (logged < 5) { logged++; LogLine("[display] Blt src=%ld,%ld-%ld,%ld flags=%lX", r.left, r.top, r.right, r.bottom, flags); }
+    if (logged < 5 || (logged < 50 && (r.right - r.left) != g_gw)) { logged++; LogLine("[display] Blt src=%ld,%ld-%ld,%ld flags=%lX", r.left, r.top, r.right, r.bottom, flags); }
     if (g_smooth) {
         void** svt = *(void***)src;
         HDC sdc = nullptr;
@@ -225,5 +274,7 @@ void DisplayInit() {
     else { g_scaleCfg = atof(buf); if (g_scaleCfg == 0) g_enable = false; }
     g_borderless = GetPrivateProfileIntA("Display", "Borderless", 0, ini.c_str()) != 0;
     g_smooth = GetPrivateProfileIntA("Display", "Smooth", 1, ini.c_str()) != 0;
+    g_defW = GetPrivateProfileIntA("Display", "GameWidth", 1024, ini.c_str());
+    g_defH = GetPrivateProfileIntA("Display", "GameHeight", 768, ini.c_str());
     LogLine("[display] init enable=%d scale=%s borderless=%d smooth=%d", g_enable, buf, g_borderless, g_smooth);
 }
