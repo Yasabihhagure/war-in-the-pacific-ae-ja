@@ -1,1 +1,949 @@
 # 艦型の名前 の対訳。key\t日本語\tメモ。key は英語名の FNV-1a 64bit (tools/names.py)
+h:006330590db5f8bf	リシュリュー	
+h:00942a867edb9f5d	タスマン/インディア	
+h:00b9177fc3f6a9a4	エバーツ'GMT'	
+h:00d56a352951c12e	大型APA(米海軍)	
+h:015dcd49e7b44da8	マンジュ TM AO	漢字不明のためカタカナ
+h:0168901bb3a25109	中型蘭印政府船 PC	
+h:0182f035a7314810	ガトー'砲艦'	
+h:01b65f293c621c5f	テンチ'砲艦'	
+h:0245b9f9bf909361	レパルス	
+h:02569221b98cde73	駆潜艇	
+h:0325113821ed4eda	カノープス	
+h:036abcd7ba2a6b2e	カンジュ丸	カナ（漢字不明）
+h:03973120b8e15c90	ホーキンス	
+h:03b3d4f5002b312b	MT油槽船	
+h:04682ee7bd24ec7b	蛟龍	
+h:04a1183dbfb3bb30	リライアンス	
+h:056419d9c7098682	愛媛丸 AD	
+h:05b30ea9c1513cce	ケネベック	
+h:05cf748ac469159d	アロール	
+h:060877251a433e0c	キャッツキル	
+h:06367252e3618e0c	秋津洲	
+h:06bd95ba72fa8f1d	キティホーク	
+h:0740e77910b75b59	平島	
+h:0750d6d23d31606b	P2 ジェネラル	
+h:0794994e022f14b3	最上	
+h:07d40be5699310e6	VC2 ビクトリー貨物	
+h:07de320915b91a29	東邦丸型貨物船	
+h:07ff1628d6670acc	エセックス級長船体	
+h:080acea6f1549b99	バンガー級TE	
+h:080d88179c910ad8	欧州L型貨物船	
+h:0867f8ee88a0ec27	サイパン	
+h:08c2e9d60663a56c	O19	
+h:0907d506f617cd65	ムラピ	
+h:09380107b5c96933	第7号型掃海艇	
+h:09380707b5c97365	第1号型掃海艇	
+h:0955c53705c22ed3	C1-M貨物船	
+h:0974aea9ce09c324	ネルソン	
+h:097a1da7d249fa52	バード	
+h:09cd646e7b470150	アルゴノート	
+h:0aabc3eae2954577	パーチ	
+h:0acad9eae2b01b68	パース	
+h:0af4ae609f9cf918	C3グリフィン	
+h:0b31629c88bb366d	鵜来	
+h:0b840b7916673705	ロンドン(改装)	
+h:0ba96d236c028f53	機動揚陸艇	
+h:0c1331d830ada107	マヌーラ AMC	
+h:0c414ed5812785b3	白鷹	
+h:0cd33a66a10b5b60	アーティフェクス	
+h:0d507ed0f26369ce	靖国丸 AS	
+h:0d64645e6dc089f8	ユニオンキャッスル	
+h:0d9e70ac22a6c8b5	大型AK(連合軍)	
+h:0e25fb661bbd9565	金龍丸 AMC	
+h:0e75d0247f253851	カペラ	
+h:0e8e2f71999180f7	オンタリオ	
+h:0ea43290f106d52b	C2-Sブルーリッジ	
+h:0ee562216a2e5c6a	京城丸	
+h:0f432bf821e8bfbb	九州丸 AP	
+h:0f432cf821e8c16e	九州丸 AS	
+h:0f432df821e8c321	九州丸 AR	
+h:0fedd5a388b3ec25	エンパイア兵員輸送	
+h:100f24f72d0a950e	エンパイア/スター	
+h:1087d818ffedfcd5	B1級 ML	
+h:10ec5680e28e8b90	リバー(豪建造)	
+h:11234f4af15c06a3	レキシントン	
+h:11682ddc5dd8283d	デリー	
+h:11912fb4e455029a	ポーパス	
+h:119cbc4bcea8f624	キャッスル級漁船	トロール船
+h:11b4c4d3ef0b5cce	アタッカー	
+h:11c74ddc5e28f321	デルタ	
+h:1209b01a9a5813ca	瑞鳳	
+h:126c7d16d26b4c93	'D'	
+h:127cfe965ea28882	明石	
+h:12dc33b7fa82c816	N-TL型	
+h:1326180682127cf0	オレゴンシティ	
+h:134a655fded98bfe	白露	
+h:1378cce33357d33a	ホッグ島貨物船	
+h:13795a6577bf5382	ギアリング	
+h:142d74fb7c35bc09	オーストラリア	
+h:145f66b9913d9106	モノワイ AMC	
+h:146390a1d8bba580	ユニオン沿岸 TK	
+h:146adb9cd5c116af	アクティブ125' PC	
+h:148c20b611f36a1b	オークランド	
+h:14964275df0d375c	グリフィン	
+h:156788663081276e	那智	
+h:1597f313206af4a8	ベンソン 対空	
+h:15dc387011929291	KPM兵員輸送船	
+h:1608638ba8eb2b86	P37級 ML	
+h:16c9f1cc0ae70ccc	アドミラーレン級II	
+h:170a43afa521a638	VC2 ハスケル	
+h:1785b5c8b46905fb	クラカタウ	
+h:1786cd98ef14c824	第10号魚雷艇	
+h:17a25121a7d3fc5f	巡潜乙型(B1/B2)	
+h:17d21f37e4dfee8e	1型 LSI/APD	
+h:17e48f93d794cb3a	ウォースパイト	
+h:18206080f418c855	マタン AG	
+h:18859d5a4bc285b3	カストール	
+h:1889925a4bc65bd9	キャッスル	
+h:18b6803aa71d6f44	マンジュ TM	漢字不明のためカタカナ
+h:194c11377eb8e7d8	アデレード	
+h:19fe70a0582759d7	ユニコーン	
+h:1a4877903945ea97	Qシップ	
+h:1aee342ee3907f8a	島風	
+h:1b05f13cc3272a98	伏見丸 貨物船	
+h:1b07b9d2a3a20ffe	C4ジェネラル	
+h:1b41b3629172f1fd	香取	
+h:1b80fa639f463516	C2-S-AJトーランド	
+h:1b8df19a456bd3de	J'	
+h:1b99ee30596b05c0	リバー(豪)	
+h:1bce9f34a6189ce4	大和	
+h:1c041e06a37490ed	S3級 SA	
+h:1c07694db687e881	エレクトラ	
+h:1c2ec99d0bef63d8	第1号駆潜艇	
+h:1c2ece9d0bef6c57	第4号駆潜艇	
+h:1c516b0464693564	クレムソン DMS	
+h:1c54509d0c0f657a	第4号駆潜艇	
+h:1d47e0e2b65be6f3	I.スウェールス	
+h:1d62c8d637882ebc	アルダー ACM	
+h:1d65200632e2f60d	ファン・ガレン	
+h:1d69155a15236af1	山彦丸 AR	
+h:1e5bf0bfb0f7ece3	マトソン・ライン	
+h:1e9716b9b5ee299b	郵船N型 AS	
+h:1e9717b9b5ee2b4e	郵船N型 AP	
+h:1e9719b9b5ee2eb4	郵船N型 AV	
+h:1f6f6a7e2f5e03f3	名古屋丸	
+h:1f9fc48ad2fb9ea0	青葉	
+h:1fbf5fc82eeb47ec	震洋特攻艇	
+h:2062a4bd4d40322c	C2貨物船	
+h:20922e29d5150a5e	リバー(英)	
+h:20c26e73ccf19d97	サーゴ	
+h:20c3f516a7fd37d1	スターライン貨物	
+h:22a3a962501b601c	D'	
+h:230b5f9c73c9f2db	ハッキンズ78ft PT	
+h:23dc9a26be334c00	タンバー	
+h:23e662b29a08eba1	シムス AA	
+h:2422767e1ece1d6b	伏見丸 AV	
+h:2422797e1ece2284	伏見丸 AS	
+h:24227a7e1ece2437	伏見丸 AR	
+h:24227c7e1ece279d	伏見丸 AP	
+h:24d657f6d8feab72	タコマ	
+h:24ed6fbeb8090ef9	Pres.クーリッジ	
+h:24ed74ea15280b8d	ラッケンバック貨物	
+h:2533234481062e81	サウサンプトン	
+h:25806f471cee0d0b	C2アークトゥルス	
+h:25af62141ea42ff0	夏島	
+h:25c4f7b6c183d8c3	S4 ギリアム	
+h:25d0b4e0f69932c0	イストミアン貨物船	
+h:260d3fbfb90e6a5e	ドイッチュラント	
+h:261a0486369b5485	戦標B型貨物船	
+h:261f8877dc4525f8	明石丸 貨物船	
+h:262e6cca46f9dd7d	ビームトロール YP	
+h:266e22228d0ba5bf	ドルフィン	
+h:267e609575bc4a96	パラマタ	
+h:26877c3235b21d71	ストレイツ/ラーマン	
+h:26c1a09b3610deab	'J'	
+h:26d237d09a66a7d3	ルーラー	
+h:270dff0fb08194c3	オマハ	
+h:2726bfcbe9a01bc7	'P'	
+h:27332bf59e6c7666	木曽丸 xACM	
+h:27483df59e7ef106	木曽丸 xAMc	
+h:2749e8d17f9153e9	アイオワ	
+h:2772c1bb7b4e4b25	インディアナ	
+h:27fb291c3a306d6c	プリンス・ロバート	
+h:2800ea3a8c83c188	ニューヨーク	
+h:28b79999d929d0ad	平安丸	
+h:29378ce726bc7f18	フェアマイルB	
+h:299fe6de4fb56846	第241号魚雷艇	
+h:29ad7ede4fc0f4ea	第201号魚雷艇	
+h:2a6a0483e9993ee1	ドーシー	
+h:2aba6afc77d7369a	グランパス	
+h:2ade24eb61d5fd96	ブーゲンビル	
+h:2af4e74e90aa9d83	郵船S型 AP	
+h:2b56849aa41638b5	ヤーロー補助 CM	
+h:2c10300170e9a86e	コメンスメントベイ	
+h:2c4f9abf92ea3efc	車両人員揚陸艇	
+h:2cdf173f6a095b63	大同丸	
+h:2cf24e8d864a8051	カス丸 貨物船	カナ（漢字不明）
+h:2d5b007462c1179f	17m L型大発	
+h:2d83a4ac91eff464	震洋II	
+h:2daf127e9766d8d0	カレドン CLAA	
+h:2dbb005a43d0bb5a	クレオパトラ	
+h:2de2f396b137645b	エンパイアL AKV	
+h:2de61d180c284952	レナウン	
+h:2df073aface0d752	シャーク	
+h:2eee3463dc5665be	ブルーリッジ	
+h:2efbdad28c228b96	N3-S ジープ貨物	
+h:2f30703dcecf7d4a	ミヤチ型貨物船	
+h:3002818cd8609177	丙型/丁型海防艦	海防艦と解釈
+h:304e30d65d176c3e	改ビターン	
+h:30ac707d78afa00b	パタプスコ AOG	
+h:3106f77f0b4e5532	郵船S型貨物船	
+h:313d2857313db5e7	夕雲	
+h:3171bbc1f91f72a7	アレンド	
+h:318fdb6f72b93577	バトラー	
+h:31edf3ec8f66c942	洲埼	
+h:3210cba8abc19727	中型 APA(米海軍)	
+h:321160b7751fc81d	S4 アルテミス	
+h:326d71d2138a9559	伊吹	
+h:32a033db7e20ab56	第13号駆潜艇	
+h:32a8e40d3538aa3a	愛媛丸 AKE	
+h:32ad0f3bca60337f	カマノ FS	
+h:32e627608c1f1b7a	イラストリアス	
+h:32f870aa340d2151	エンパイアL貨物船	
+h:33afb211af8ea8a0	ETC中型タンカー	
+h:33d003a31f44162d	浅間丸	
+h:33d52f1150d5a938	バサースト	
+h:33e61dfa74225c7e	戦標C型貨物船	
+h:3498a7e96077e7da	S3 モーターランチ	
+h:34d2534e585c0dbe	伏見丸 AKV	
+h:34d2624e585c273b	伏見丸 AKE	
+h:34f543373a32216b	瑞穂	
+h:35014310ec7db0ed	17m N型大発	
+h:353d96c02fdb6583	P1-S2 ドイエン	
+h:35aaaef593289e55	ブエノスアイレス AS	
+h:36181a7834818507	ニューオーリンズ	
+h:365e7ce686cd2597	八十島	
+h:365f4039d49208f0	カサブランカ	
+h:368f83b9c9492ed8	リゲル	
+h:36d353fcdac1b825	日進	
+h:3716a2a25e77a34d	フルトン	
+h:372d85d6f0ff91d2	ザイデルクロイス	
+h:37e3ecaec5a2b373	樅型	
+h:37e3f2aec5a2bda5	桃型	
+h:386293a857bfb739	C2-Sマウントフッド	
+h:3902627053b03d99	ギャンブル	
+h:3932dd9a287bc55c	駆潜艇4-12号	
+h:3949b594d8e68f14	エセックス級短船体	
+h:394f6556b7d74875	丙型	
+h:3974b539dc2d0c60	'S'	
+h:398a183bb9ab1c39	駆潜艇51-53号	
+h:3999c2f440714a5d	ハッカイ丸	カナ（漢字不明）
+h:39ce472cc2ef057c	ギアリング級DDR	
+h:3a6b879aab6947f3	ブルックリン	
+h:3acf779d3172ede9	PMM兵員船	
+h:3ae1c5854c1140bd	スキュラ	
+h:3ae90e2c929abf0b	上海丸	
+h:3b0603e1687a4a0f	欧州M型貨物船	
+h:3b31a05d1651ab2d	'T'級1940年計画	
+h:3b8b5fa98c66e8c5	小型 AP	
+h:3b8b74a98c670c74	小型 AK	
+h:3b8e19d0bbfa42b3	第1号駆潜特務艇	
+h:3bbad574bdc5d411	デ・ロイテル	
+h:3bfc5eb643da9192	リバモア	
+h:3c24fb1d08f11201	欧州K型貨物船	
+h:3c446f87facb2b8c	リバティ	
+h:3c697e469ff3afa6	アドロイト173' AM	
+h:3cb68db59b0f0252	古鷹	
+h:3cd7398d2d52a61a	1TM型 AO	
+h:3ce86314614d5ee1	アシスタンス	
+h:3dbf39adf26de1eb	小型油槽船	
+h:3e5e50bffd99c077	モンタナ	
+h:3e8550338a13fb33	イザベル	
+h:3f3430c71885d0e5	蒼龍	
+h:3f608f47fe2d84cc	グリーブス 対空	
+h:3f779f9e1772ad11	C2-S-B1アンドロメダ	
+h:3fc402184440e35f	サーモン	
+h:3fcf95a6493e29cc	伏見	
+h:3fdaa7779157fa8d	スウィフトシュア	
+h:40661be8dcc1cccc	マハン AA	
+h:40aa5faa0edda9c8	大型AK(米)	
+h:411aa8400a6784cf	ヒンドゥスタン	
+h:416f4f154c400e45	愛媛丸 貨物船	
+h:41d51c19c9b30a70	伊勢	
+h:420650f1fd85d0b9	グリドレー 対空	
+h:4245ca3ab0f51602	分割式浮ドック	
+h:4324293ded3248f4	戦標E型貨物船	
+h:43c56ef602c41c76	インダス	
+h:43c9d57cadedb25c	'G'	
+h:4592095cc0bd119a	エンパイア/グレン	
+h:459653890a8b60f9	ラングレー	
+h:459ad1e1c866069e	プリンス・ヘンリー	
+h:461cd3e4aa083bda	ソーニクロフトHDML	
+h:465a829b2bf3781f	朝潮	
+h:46990317360c1816	小型 AK(連合軍)	
+h:46f33d211c5fd0ff	能代丸 AMC	
+h:475551ac35b83e9a	ロンドン S	
+h:475552ac35b8404d	ロンドン R	
+h:47818f6cf9e00350	'C'	
+h:47919cbd7ea47255	ウィックス級DD LR H	
+h:47aa2cd3a22ce81b	トランスマリン母艦	
+h:47ccebe6fe79fb2f	パーク/フォート貨物	
+h:47cd17047d16dee5	クレムソン AVD	
+h:47e173047d282443	クレムソン APD	
+h:47f4d18eb523a5f1	ポーター	
+h:48e19b9bc20d50de	トレジャリー AGC	
+h:4931577a9e745e3e	BK貨物船	
+h:4945b704d5d2bbb1	ブラックホーク	
+h:49a94ea205463ec5	エンパイアLSI	
+h:49b142aecfdab025	摩耶	
+h:49b4e65ec4e1cb4b	ラガリソニエール	
+h:4a25b475eeb3248c	14m D型大発	
+h:4a707c6439d60456	ケダ AG	
+h:4acdaf20996cc383	ナバホ AT	
+h:4b0d7bd386d61b46	コロラド	
+h:4becceb830f5e64d	バグリー	
+h:4bf6f0203a2e8e4a	EC2リバティ貨物船	
+h:4ce7641da2f766fe	アキタニア	
+h:4d054210992bbfd4	カス丸D貨物船	カナ（漢字不明）
+h:4d5bcc960c17ed52	フェデラル貨物船	
+h:4da68c11c9c33bd2	飛龍	
+h:4da93c266cb79c8a	ストレイツ/ホン	
+h:4dcea8a64bc7e26b	大型AP(米)	
+h:4e3c5bd29217a3bd	アドミラルティ'W'級	
+h:4e3ffbd2921ae974	アドミラルティ'V'級	
+h:4e46cbd29220b692	アドミラルティ'T'級	
+h:4e49ebd2922322c9	アドミラルティ'S'級	
+h:4e5fc1c240e375a2	ケープタウン	
+h:4e88b6516a5db580	ベローナ	
+h:4ea70b01d1fbfab6	八重山	
+h:4f00263097807af9	ペンサコラ	
+h:4f96f8af0da1511f	アコンティウス	
+h:4f980b71915a907c	C3-Dクレセント	
+h:4fb95ab66d87f1a2	シンショウ丸	漢字不明のためカタカナ
+h:505642959805d0a2	N-TL型 AO	
+h:50835247304fffe0	S1 モーターランチ	
+h:50b1dd9b06bcb777	シードラゴン	
+h:50b8175325d70aa9	丁型海防艦	海防艦と解釈
+h:50b8185325d70c5c	丙型海防艦	海防艦と解釈
+h:50e5035a65b2eee6	フラワー	
+h:52532a8a463b1931	サンガモン	
+h:52d14d3bc7e3c7fa	平甲板	
+h:5316d8ff4919c6e4	郵船A型貨物船	
+h:5324adc5a78ee3da	フラワー級Q船	
+h:534ba197a7749a45	T2-A2 エッソ	
+h:537a30dba1c82108	初春	
+h:539d953764101c1a	C2ラッセン	
+h:53c02657cceecdc7	アンシュウ丸 xPB	カナ（漢字不明）
+h:53d5bd5c6ea1c6af	巡潜乙型改(B3/4)	
+h:54143a901cd84f35	靖国丸	
+h:543673b722b0f299	トライバル	
+h:54f26af38548f312	'Q'	
+h:55aa10d29f644255	アミーア	
+h:55c38c31c0b0dda2	APLライン	
+h:55dfe82dfa917fa4	ホッグ島母艦	
+h:564cbac73bf24944	ゴザン丸 AG	カナ（漢字不明）
+h:567760bd4c639487	バーミンガム	
+h:568ca93947a1f753	C1-Mアラモサ	
+h:57558e36a048eee6	小型 AKA(米海軍)	
+h:5765e0b1ddb00d9c	橘型	
+h:579f1df49475fd8b	アデン丸 貨物船	
+h:57e6e728230121d4	インディファティガ	
+h:5854debe3b2e767c	キャノン	
+h:58730a8620e4e08d	KVIII	
+h:58b0f603e7282b10	常磐	
+h:58ce63a6b349a75a	'I'	
+h:58fb00b9226095f0	千歳	
+h:5910e29184f25d4b	占守	
+h:594be113c2b80d21	マオリ/ユニオン	
+h:596aa82cfc714fad	クイーンエリザベス	
+h:59780fce6aa36863	オグララ	
+h:59e63f0724c91b7f	ドビン	
+h:59eb3edd956d2d0d	オーダシャス	
+h:5a4410eb33fe74b2	勝力	
+h:5a6e872da54aa530	シュルクーフ	
+h:5a6efcfb3a10a381	利根	
+h:5a709aaf71772b13	大淀	
+h:5a8d0f3bb6d772c5	海大3型(KD3A/B)	
+h:5ae441e4ef0a5f6b	テラー	
+h:5b80152c275cd732	マタロア	
+h:5bd54a294bb90ff9	プロメテウス	
+h:5bddb31b198bf95e	コカトゥー	
+h:5bfd74a5f9b8aabc	ランプラ	
+h:5c6fc74bdfb6449d	ヒッパー	
+h:5cc716baa7286f9a	ドミニオン兵員輸送	
+h:5d113019363f4e7d	ボーグ	
+h:5d2c045abd6db58e	サンH型	
+h:5d6c81d5c9af3a8a	大型タンカー	
+h:5e070a650ccd6b71	ストレイツ/ケダ	
+h:5e817604f58f50df	Shch型	
+h:5f6428cc58cd0976	クレムソン級DD LR	
+h:5fa999349c9cc965	睦月	
+h:600fa8b61c8d1b08	マウントフッド	
+h:601734158d07631f	アドミラルティHDML	
+h:60b13aeb4822260c	アデン丸 AKE	
+h:60b14deb48224655	アデン丸 AKV	
+h:611092089c12ff07	神威 AV	
+h:615aa801db4921f8	パシフィック兵員船	
+h:61d06f914a309a90	赤城丸 AMC	
+h:6239eedec35fe493	球磨	
+h:62433b1f6dbac56b	ヴァンガード	
+h:62f3fff031a76d1f	愛国丸 AMC	
+h:63cdc2a38c4418f9	リバー(加)	
+h:64392cd59f204c47	P1 モーターランチ	
+h:64f7ae4b7787eb1b	BI汽船	
+h:65e5eca135f72b45	KXIV	
+h:667c8595d3e011ea	中型 AP(米)	
+h:682a379fdd67cad0	アラバマ	
+h:684d036a45c47ca9	ノースカロライナ	
+h:687816c0c66243a9	シェルA型	
+h:69765b178e9ff3a3	戦標A型 AKE	
+h:69df3d9868383212	エルコ77ft PT	
+h:6a1916e8ed29b235	沿岸タンカー	
+h:6a37775dba06b3d7	C2-S-Bサムター	
+h:6a44b7f0aef2bc8e	陽炎	
+h:6a891883d3cdc754	カナダ太平洋	
+h:6ad891deee36322f	ニュージャージー	
+h:6ae54a946b1af2be	ヨークタウン	
+h:6afdedbcaae804ba	ボルティモア	
+h:6b305e928838caa2	ナイアガラ	
+h:6b638463b5f2706e	神風	
+h:6b738afce4f8638b	駆潜艇1-3号	
+h:6b8859ce41a27625	ポーター AA	
+h:6be29880d4d95eeb	バード AVP	
+h:6c21a414cda54893	エドサル'FMR'	
+h:6ca6c5f99e17421e	ストレイツ/マタン	
+h:6d6bd7bfab472984	エバーツ	
+h:6df9494fd8e1961f	レニングラード	
+h:6e96ee01fb583648	バラクーダ	
+h:6ee3fcb70534b7b9	L型	
+h:6eeae070940f4e34	ナーワル	
+h:6ef16f759a2cea7e	ネバダ	
+h:6ef53d390b8c494b	C3-S貨物船	
+h:6f813fcc771a2889	小型蘭印政府船 AVP	
+h:6fa222e50600bf3d	大型AK	
+h:6fa227e50600c7bc	大型AP	
+h:6fee193997a66a1b	あきつ丸	
+h:706ea3efa337984a	ハリス	
+h:70907ede3abe2019	キウイ	
+h:70ae1bfcc9522447	ポートランド	
+h:70e3568626f9079d	'Z'	
+h:7113db2cb48d0699	センダイ	
+h:7139dc25e8850caf	阿賀野	
+h:7145ae65263c97e8	ロングアイランド	
+h:717ab8ec18fe1a6d	BTK輸送船	
+h:7183993a4d5d84ba	エンパイアM貨物船	
+h:71b73b7ce22c7a2b	ソーマレズ	
+h:71eed4132de55d75	戦標B型 AE	
+h:7258ad9333b3a10a	隼鷹	
+h:72b1791a13bde64d	パイロ	
+h:72c73d135defd9ed	英'T'	
+h:73a74819e54efb22	第13号型掃海艇	
+h:73be842d3984bef2	足摺	
+h:73c4cecc57f2a1d4	'T'級戦時急造	
+h:73eb3e19e588b6f0	第1号型掃海艇	
+h:73eb4219e588bdbc	第5号型掃海艇	
+h:73eb4419e588c122	第7号型掃海艇	
+h:73f7868cfe7d9d73	機雷潜(KRS)	
+h:741289c1189e286f	ラドロワ	
+h:7419678cfe9a4f2c	海大4型(KD4)	
+h:7419688cfe9a50df	海大5型(KD5)	
+h:74196a8cfe9a5445	海大7型(KD7)	
+h:7450ef12a248606a	ギアリング級DDR対空	
+h:74656a743bbe6675	後期ベンソン	
+h:74bdec77b5979722	グリーブス	
+h:751ba5ac47cbfabb	ワシントン	
+h:75581ca0e7c44e68	メルバブ	
+h:755deee5c4d4f3f4	暁型	
+h:7610047db4a4c21f	インディペンデンス	
+h:763bc5c54e965298	ベルグローブ	
+h:768b94fbb723955e	ソマーズ	
+h:7692ad3a71bbdac6	A・M・サムナー	
+h:76ac406c745b39b6	ドミニオンL貨物船	
+h:76bb3e20bc159ba4	フラワー(カナダ)	
+h:76d3c44414035dd9	ポーチュナス	
+h:76f7de4d739fbe1c	トレジャリー PC	
+h:76fce1aa76c52e9b	間宮	
+h:77133d020117bc0b	P1級 ML	
+h:777612e8117ff021	テネシー	
+h:77c4c881b0668174	アトランタ	
+h:77cc3bdfa367f004	海鷹	
+h:78589f6aa7482f15	ビクトリー	
+h:78b18d24e7b8d665	シムス	
+h:790d6ba57d92a46f	盤谷丸 AMC	
+h:796198e72671a634	吹雪(II)	
+h:7994cca84e2862fa	御蔵	
+h:7a03927ae992408a	九州丸 貨物船	
+h:7a6e15a48b1e605f	ヴィンデックス	
+h:7b0f3d860b65cd80	小型 AP(米)	
+h:7b36e5ac98da190b	トランスマリン貨物	
+h:7b6cdc10c75bf24f	ダイゲン丸 AG	カナ（漢字不明）
+h:7be2df39f727faa2	エンタープライズ	
+h:7bf33cfeba219573	小型 AK(米)	
+h:7c8d02a84ea262e5	サムナー	
+h:7ccf8c32316de416	戦標DT型 TK	
+h:7d5436625717819c	スコット	
+h:7e366096fcc32c7a	戦標B型 AKE	
+h:7eb51226a7fccc62	OTK ヴェプリ	
+h:7ee1757c3b3112c7	赤城丸	
+h:7ef4ee39bac61821	明石丸 AD	
+h:7f24e561515b180b	アイルズ	
+h:7f40e0ba8daf2d3e	ブリストル 対空	
+h:7f6de107e03ab646	ヴィクス	
+h:8006017d13991cf7	O21	
+h:803160185e87319b	明石丸 AKE	
+h:806ba5fa0908e055	戦標ETd型 TK	
+h:80738f3fa0dd08a4	KV	
+h:809d047965c24824	BP D型	
+h:80d694d1a0b52610	山陽丸 AV	
+h:81566382168b5455	戦標C型 AKE	
+h:81714901074e8d59	第13号型掃海艇	
+h:81714d01074e9425	第17号型掃海艇	
+h:81714f01074e978b	第19号型掃海艇	
+h:8226b9732431ab9b	択捉	原文の綴り誤り
+h:8253a14f5d30ef6b	エセックス	
+h:8262228641d8761c	ライト	
+h:82970ba24881dab4	ヤンセンス	
+h:82a351697eecda69	J.v.アムステル	
+h:83363a3367f913cb	中型 AP(連合軍)	
+h:834799905061ba57	高雄	
+h:8349c80b7033d1cd	松型	
+h:8378d00b705b5027	マタイ	
+h:838a33bfc1d8bfe9	セレス	
+h:83ad3f85802e79ad	山城丸	
+h:83c2c2c8f8e552f6	ル・ファンタスク	
+h:83f508ee487417d2	レイク型貨物船	
+h:841be12681d9f833	アルゴンヌ	
+h:842625237cdf6677	バトル	
+h:844418371210f859	シェル石油A型	
+h:846a086664a3f9e5	木曽丸E貨物船	
+h:84d61d11f307021d	中型蘭印政府船 AVP	
+h:85091711f3325184	中型蘭印政府船 AGP	
+h:852365b9d1281809	モノワイ LSI	
+h:853a193e72267e68	クイーンメリー	
+h:85759221623cbffd	W.v.d.ザーン	
+h:859d04475b690b1c	愛国丸	
+h:85a85d0891fdf40d	甲型	
+h:85bb46f70d9d3b65	小型蘭印政府船 PC	
+h:85ea4c881a9d4edf	ウェイクフィールド	
+h:85f582f70dcf19a0	小型蘭印政府船 AG	
+h:86877073ab152875	O16	
+h:86b233c528659ba4	ウルフ	
+h:86e2b6fcd5d1e485	デュゲイトルーアン	
+h:87956bb0563db0ea	ぶらじる丸	
+h:879843c30c56b4d0	杵埼	
+h:87fe7c2dc2504fc1	バーネガット	
+h:881efb042a489b0d	アンシュウ丸 貨物船	カナ（漢字不明）
+h:8820f089a2750016	キャメロン	
+h:88beea926e75985c	リバモア AA	
+h:88c4a6022d587306	ワスプ	
+h:8998f501f853016e	フレッチャー	
+h:8a9ad924f2093cd1	宗谷	
+h:8b18a84aae5d79af	テムズ	
+h:8b24ef2657cf9120	サンプソン	
+h:8b50dc1bb20b1e95	クリーブランド42案	
+h:8b5eca1ba57c3acc	駆潜艇13-89号	
+h:8bb82e1c641baef7	パトカ	
+h:8bdf3071e579665c	メドゥーサ	
+h:8c21b88aff637b5e	'U'級1941長船体	
+h:8cc1caa39bf34a4f	金剛丸 AMC	
+h:8cfda5240a44abbd	魚雷運搬船	
+h:8d1ec8695b3ae4a9	乙型(B)	
+h:8e1dead948e925ad	ヴァンパイア	
+h:8e35f6b4e6e0adb9	ペンシルベニア	
+h:8f219c2e3983f991	ハント級III型	
+h:9161ad9fab8efcae	ミヤチ AGP	
+h:91e460a7d3495fe7	S1級 SA	
+h:920591fa2b49dd16	戦標A型 AE	
+h:924607f7bb5c2081	'F'	
+h:9290ba14bb9b6a17	ハリマン母艦	
+h:9326e17f94758959	クリーブランド	
+h:935985f1026794e1	迅鯨	
+h:935f8b659c0ad23a	フレッチャーHB対空	
+h:93ffea92652cd23b	タンジール	
+h:945115b5ebe32d6c	IX/C40型	
+h:949d06c171670e0d	ヴォスパー 72' MTB	
+h:9521eb905aa43a99	大鷹	
+h:955beb905ad5b2e0	大鳳	
+h:955fc37ec1b10746	神川丸	
+h:9579f42e6c85f911	ストレイツ/クラン	
+h:95966cbb4fee0c5d	択捉	原文の綴り誤り
+h:95dfbcf6dd73f1fa	バルカン	
+h:95ef16c420ed2c4f	'S'級戦時急造	
+h:964cc72224b7db5f	クレムソン DM	
+h:964cce2224b7e744	クレムソン DD	
+h:96aa748adcb22cfc	ゴザン丸 AGP	カナ（漢字不明）
+h:96bea1e4cca0cc30	友鶴	
+h:96cf156cc5facdea	津軽	
+h:973f7d0b53c1ac40	BP石油D型	
+h:97526723239b71b9	グネフヌイ	
+h:97f6dfb1007f72e2	MGL K	
+h:984f2ae76a1433b7	アルジュノ	
+h:9850ff9c54396af9	プラティパス	
+h:98b50ad478d1a448	アドミラブル	
+h:98db2d66088a26dc	リマ丸型貨物船	
+h:993cc375d5c2fa4e	QE級(ヴァリアント)	
+h:994a870d3a797c94	ヘームスケルク	
+h:9a397710b747d46f	インプラカブル	
+h:9a5a7af46ceab063	インドミタブル	
+h:9b410ad7f0b698b0	マヌーラ LSI	
+h:9b74683ef9e70fd4	MGB K	
+h:9bd6b7418f4b6980	北上	
+h:9c33ebd9337a6652	オリオン	
+h:9ce23b7a8f91ed37	沖島	
+h:9cec60e69fb93ac6	改ブラックスワン	
+h:9d38fe021c3d9a68	赤城	
+h:9d5e8e668660c0e9	アンシュウ丸C貨物	カナ（漢字不明）
+h:9d96febb4db00cdf	ラッセン	
+h:9dca629ed2aad0bb	メイドストーン	
+h:9e497ba0f5123706	九州丸	
+h:9eb3b8c81bfd6d1e	鴻型	
+h:9f42e434242d3211	補助/クルンバ AO	
+h:9f8f2e42cd3738e2	神川丸 AV	
+h:9fa09851b280a454	名古屋丸 AS	
+h:9fd7ab3d79cfe689	バラード	
+h:a02d64cde696988b	バローズ	
+h:a05d1bd9606c9be5	チトラル AMC	
+h:a0c8a307f6190c81	リバー(豪海軍)	
+h:a147952f98cdc2f1	MK貨物船	
+h:a160b95737fbd1f0	海大6型(KD6A/B)	
+h:a16e34e6d2bed83c	'S'級1942/43年	
+h:a18c7e3cfde853be	改リバー(豪建造)	
+h:a24c4ab17257a350	エッソT型	
+h:a382207208ceaf36	東邦丸 AKE	
+h:a3cbb7298ec492c7	アルジェリン級TE	
+h:a45406570798af02	アッシュビル	
+h:a4c8b14185b46ef3	J・C・バトラー WGT	
+h:a50898265accf6f3	大型AKE	
+h:a59611704b7a37f7	メリーランド	
+h:a5d1a78c5970315c	カーチス	
+h:a61eca8c8a796f65	潜特(STo)	
+h:a61efe8c8a79c7c1	潜高小(STS)	
+h:a6f8710b84b46f22	マハン	
+h:a73eae4d7565be16	EB社 S-42	
+h:a74fc24d75745345	EB社 S-18	
+h:a80086a042d5f499	'E'級第2群	
+h:a8bdbd3130e6c2d1	'V'	
+h:a8f4d61b044f4fb2	チモ ACM	
+h:a9015679c197a896	P17 モーターランチ	
+h:a9747ac504aad33e	ウィチタ	
+h:a9aa67b4d5019cf2	雲龍	
+h:a9acd25e49397c4f	ヒギンズ78ft PT	
+h:a9c16b6f29498b0b	戦標D型貨物船	
+h:a9ce1d5cdf09c13c	カシャロット	
+h:a9f28f9bf2da7b57	エジンバラ	
+h:aa037a6255fc8907	峯風	
+h:aa36bebd89cbd670	アラスカ	
+h:aa9e5a214edbbab2	リマ丸 AR	漢字（利馬丸）は不確か
+h:aa9f5aaac0dbdaf9	金剛	
+h:ab7f2a0cd0fe64fd	エリー PG	
+h:abff4b8f7d673131	客船 AP	
+h:ac15294c0dc33b9d	ランギ/ベイ	
+h:ac1593b670e94b87	S	原文の引用符が欠けたもの
+h:ac99e1d01883e1ce	フラワー級加国建造	
+h:accd494d05306851	ハント級III型	
+h:ad181d4343ef967f	ワイオミング	
+h:add3cc0bf62b142f	'H'	
+h:ae246b9f0aee2901	ウェストバージニア	
+h:ae583f27dc7969e3	ハーミーズ	
+h:aec0f8d39d1c63fc	ウェストポイント	
+h:afe45a4c3730b7de	アテンダント AO	
+h:b0acaa442c6e640b	知床	
+h:b11c7884dc9cb90e	扶桑	
+h:b1364c955eb10f61	大型タンカー(米)	
+h:b136edc6520880a7	吹雪(III)	
+h:b1b95b3b1a7432c5	ダイゲン丸 貨物船	カナ（漢字不明）
+h:b22be63b2e0039cf	パシフィックM貨物	
+h:b23b9a5ce9b16006	WWI '24'	
+h:b24f6a5ce11f5445	ウィックス級DD LR	
+h:b251776e54df8b4c	トシマ	漢字不明のためカタカナ
+h:b27eb84530a76c9b	D級 対空	
+h:b27f7a11f741a4ff	'Ca'	
+h:b29054410f1e2c85	神鷹	
+h:b297c95098341a0f	コロンビア	
+h:b39119e334c5cf87	C1-A貨物船	
+h:b3d00e6d52129e78	ブリストル	
+h:b3e2ba3f62985408	大型タンカー(連合)	
+h:b41d31e3e9c3a71d	ブルームフォンテン	
+h:b44da2f559444287	C3-S-Aベイフィルド	
+h:b465e65d0a2cc074	P17級 ML	
+h:b4677579b0fae497	プロ・パトリア	
+h:b4f40112ac117e9b	T2-A1 モービル	
+h:b539bede617464d9	加賀	
+h:b54388e7a61a9398	ドミニオンモナーク	
+h:b587807e05bc0904	ガトー	
+h:b5968e6263004de2	ハント級II型	
+h:b5b7c955f1421a36	小型油槽船(米)	
+h:b5f4c12265125742	'A'	
+h:b710e144500bb678	C3-Aジャクソン	
+h:b718651bee346df0	C3ハムル	
+h:b75e5b64f984d2ec	'W'	
+h:b7ad1671b8a8ce25	'E'級第1群	
+h:b8083c8c393faebf	信濃	
+h:b8334d862a4c9cc7	VC2 ボルダー	
+h:b8f68fb6caf2d437	トライトン	
+h:b8fc0e24ffca49ef	'N'	
+h:b90f917a9932cd20	P	原文の引用符が欠けたもの
+h:b93d6c6df619ff32	シュフラン	
+h:ba29658505429fd4	リバー(英海軍)	
+h:ba30838d8d88b417	カレドン	
+h:ba5ab8c13edf7d8e	樫野	
+h:ba8b9cb7ac6e36b6	ベンソン	
+h:baf43a06a2e69ebf	戦標CT型 TK	
+h:bb581ae762a2cea9	ブラックスワン	
+h:bbc4e2dd9ded9bc9	戦標F型貨物船	
+h:bbfc01c1303587e8	リアンダー	
+h:bcc3399cbea331d0	P37 モーターランチ	
+h:bd72eb692669771b	小型 AKE	
+h:bd73a9b9860a2ae3	マサチューセッツ	
+h:be67e2b74faedc56	S型	
+h:beb6ace555f70c6a	2TL型	
+h:bf26c64eebcc1cd9	ホランド	
+h:bf850aaf55386331	YO-65型	
+h:c03356d4e6ecd3ad	P2 アドミラル	
+h:c03433d567f8adca	ミヤチ AG	漢字不明のためカタカナ
+h:c04b6fc20d9b0c51	郵船A型 AP	
+h:c08b97ce82a08766	コタ・インテン	
+h:c11e5fc2285b2387	ネオショー	
+h:c1b29a5ba7db937c	ロイヤルソヴリン	
+h:c1c295194ff26659	バグリー 対空	
+h:c234128b1d2b68fa	震洋	
+h:c2af8aea5b96bba5	ジャワ	
+h:c30c3f7e1213a6ac	沿岸貨物船	
+h:c3789489d03f43ac	ギアリング 対空	
+h:c3eede6dbd1ced17	ハリマン貨物船	
+h:c4095f96847539d2	戦車揚陸艦	
+h:c4237bcdbf14424c	天龍	
+h:c47d720017f7de5c	ディキシー	
+h:c4e31b41b679d902	BTC大型タンカー	
+h:c4e5b1b504d85f5b	シャイア AMC	
+h:c4e721a4376ebd22	若竹	
+h:c4ebc24a8085f7a0	ソマーズ AA	
+h:c616b737a8396323	ロッホ PF	
+h:c6cc0faf428bb2e7	テンチ	
+h:c7975ac436638c2f	小型油槽船(連合軍)	
+h:c7d783e2d5bcd0fb	プールスター	
+h:c809888d8a8f3a01	C2-T貨物船	
+h:c88d4a10dcf96250	港内支援 AO	
+h:c8a3b928fb434d99	室戸	
+h:c946c8400ae80bfe	ベンハム 対空	
+h:c9d4334b26eea04d	LST II型	
+h:c9d9a9e3a8fcd7bc	戦標BT型 TK	
+h:ca1040e0bfb78db3	P9級 ML	
+h:ca5de36147cf43a2	ハント級II型	
+h:ca7e966bd23410a9	サウスウエスト貨物	
+h:cb6e6fc0260c7d95	歩兵揚陸艦	
+h:cb8b4c180b4435b6	カナワ	
+h:cb8e67f97648e78b	グレースライン	
+h:cc3ef5dd3649b934	ニューメキシコ	
+h:cc5cbc4a71ca40e8	大鯨	
+h:ccfa2d20dd5abd5d	島根丸	
+h:cd81477031c5dfa5	戦標AT型 TK	
+h:ce39ae3e3f3d3915	リソース	
+h:cea37dd406abbba1	ファン・オラニエ	
+h:ceda16c7c229943f	レイク250' PC	
+h:cf129e9f47d4c2d7	マンリー	
+h:cf281a2518a7088c	スワン	
+h:cf35ad0f933498e6	R.H.スミス	
+h:cf41db26d51bea0e	ワレゴ	
+h:cf5e22098a3b41f9	KXI	
+h:cf82f01279431a72	アランタ	
+h:d05a89d7a33d46e3	択捉	
+h:d08b64a268ba4a53	スラバヤ	
+h:d114f24be3a5fc93	アダマント	
+h:d16f83ffc1670fc8	アブディール	
+h:d18b186c1382268a	シュヴルイユ	
+h:d1bc06fb7d14047f	タイン	
+h:d1c5d2f2f4a2bd7c	バンガーディーゼル	
+h:d1d9cf4428a0310c	アリシューザ	
+h:d1f10284eeb17b25	フィジー	
+h:d23199699d67fca5	Q	原文の引用符が欠けたもの
+h:d24bb61f8a955c1f	MTB K	
+h:d2e480db47c6c851	第13号駆潜艇	
+h:d2f1f6db47d21b2f	第51号駆潜艇	
+h:d340bf539960ba26	巡潜丙型改(C3/4)	
+h:d348cc5760caddb8	ブエノスアイレス丸	
+h:d37e8a5df21dcdc6	ジェンベル	
+h:d3be413facbca895	初鷹	
+h:d486bf87f5aca5ad	グリドレー	
+h:d498bc907c407cf9	吹雪	
+h:d4d65be805651646	'C'級 対空	
+h:d4f672a1a8a1c9e4	ミッドウェー	
+h:d5024264326c04d5	C3-E貨物船	
+h:d509e00532677d87	バックレイ'TE'	
+h:d53650d3753110ab	クレムソン級DE LR	
+h:d5d5111ea52710be	'U'	
+h:d5f983de73772f27	ケント	
+h:d664026b04c35e4b	ノーザンプトン	
+h:d66c409f00b86b86	英'S'	
+h:d6a6bb88c9f5ec33	蓬莱丸	
+h:d6f5f6618c60fabe	Ca'	
+h:d71dd2dca62df0e6	バンガー/バサースト	
+h:d79094f3997e5598	パシフィックL貨物	
+h:d79584a19e3bc9b9	九州丸 AKE	
+h:d79591a19e3bdfd0	九州丸 AKV	
+h:d880f04edfa0191c	橋立	
+h:d89ac972199b2a7a	シャルンホルスト	
+h:d8a226a2ad07bde4	エルコ80ft PT	
+h:d9af67e3e42e1d02	慶福丸	
+h:d9e6edeb68410ee7	キーオカック	
+h:da92a435e4a6016c	龍驤	
+h:da98c435e4aaa37a	龍鳳	
+h:daaf148cab2dd176	クリップフォンテン	
+h:dadd89b1971b0897	ウーリッジ	
+h:db2ed89ea3046e35	ルシア	
+h:db8702a6e6111d7c	第1号魚雷艇	
+h:dc07beab1c616218	熊野	
+h:dc54db9f2913df1e	大型AP(連合軍)	
+h:dc76399a8adc4cff	翔鶴	
+h:dcb3cadefc3dd076	中型揚陸艦	
+h:dcb7536c713e78b8	エリー	
+h:dcca8f958381b1db	1TL型 AO	
+h:dcdda4bed196c560	戦標A型貨物船	
+h:dd12829db043395d	ドミニオンM貨物船	
+h:dd61e911873996b0	EC2クレーター	
+h:ddcba7ab27d4778c	戦標D型 AKE	
+h:de223b0a1d1dfb3f	ロンドン	
+h:de87b180a87186e3	'T'	
+h:de8d31e0a730f684	ヘレナ	
+h:debc1bb027b82964	ランガティラ	
+h:ded325526fcae336	ファン・ゲント	
+h:df225dbc59037899	ファラガット	
+h:dfc9f226dd5dd3fe	マリオンコーブ	
+h:e0513deee04ee875	吹雪(I)	
+h:e0bd96e70bd5fb09	エリソン	
+h:e0c2dc2c0dac041d	C1アコンティウス	
+h:e1812a94a03ab770	海大6型b(KD6B)	
+h:e1812d94a03abc89	海大6型a(KD6A)	
+h:e1a262e360cecbf4	バラオ	
+h:e1b6eb8e51a3394b	SK貨物船	
+h:e24e007d007fd2e2	図南丸型捕鯨船	
+h:e256747b777de24d	アドミラーレン級I	
+h:e25be90bf6d81349	大連丸	
+h:e2c80ac27c1d9121	フガス	
+h:e2d33a92e88eea6f	P9 モーターランチ	
+h:e2e4c0dbe18e15ef	中型 AP	
+h:e2fd0403d217ecf5	カスケード	
+h:e330e96e8e651ef0	レグルス	
+h:e33a76fe909cb7fa	グリドレー/マコール	
+h:e364a80e7e8e8058	マッコーレー	
+h:e4068b22cf61f200	バラオ'砲艦'	
+h:e49877314d2dc724	クロスリー	
+h:e49fe8d7f230bbf6	平安丸 AS	
+h:e4c9518e05b7d499	パシフィックS貨物	
+h:e4ce707069406078	1TSd型	
+h:e5f78b38e3b25fef	フロビッシャー	
+h:e6247a414f357f46	妙高	
+h:e683cc8467ba246d	鎌倉丸	
+h:e6845b7d2d664ad8	サウスダコタ	
+h:e6ec9c37b1c27060	ヘイウッド	
+h:e72566be2fd5488c	A	
+h:e87c95fdaea505ce	ストレイツ/ラウブ	
+h:e88969d0787f1618	A・M・サムナー対空	
+h:e8935a90236ae1ff	郵船N型 AKV	
+h:e8936b90236afee2	郵船N型 AKE	
+h:e8a86d9e9b87690a	測天	
+h:e8cd221a1c273ec9	小型 APA(米海軍)	
+h:e8d76ec8ddacf8d5	A'	
+h:e8e778ab2145d814	フェデラルE型	
+h:e9111daf85fcddc0	シャイア	
+h:e917f4f703933f6d	フラワー級WWI Q船	
+h:e9f607d68bca0c1e	EC2ザンサス	
+h:e9f693ed8ccde534	イキツシマ	カナ（漢字不明）
+h:ea0ce2e2b5cc4d76	ノーフォーク	
+h:ea721eccfb332efe	イストミアン母艦	
+h:ea783c1cee9be5cb	高砂丸	
+h:eac8859dc34ac9c4	キーロフ	
+h:ead1a79e9ddc9fb1	アデン丸 AR	
+h:eaf97919986fb2b5	ガー	
+h:eafd31be253c6dee	'E'	
+h:ec1d4959aa37d381	大型AKA(米海軍)	
+h:ec41d6e1e5fd305e	郵船S型	
+h:ec41e3e1e5fd4675	郵船N型	
+h:ec41e4e1e5fd4828	郵船A型	
+h:ec9e0a3e8669152f	夕張	
+h:ecdaae244bb08d1a	MK沿岸貨物船	
+h:ecf42de9d6a452bb	カス丸 AG	カナ（漢字不明）
+h:edf3afac09365e7b	バンガー級VTE	
+h:ee3109d820f33b94	ノヴィク	
+h:ee6928a0477865a4	ファニング	
+h:ee70381b2bb7a04a	チモ YMS	
+h:eeaca5ba27350ecf	ビターン	
+h:eed174d14246c7dc	秋月	
+h:eee4ded6aea83884	アルダー YMS	
+h:ef3060ad6984f035	キングジョージ5世	
+h:ef6a605a264fdfdb	伊良湖	
+h:ef9983527bae71d1	後期ベンソン AA	
+h:efb0a9f15a744008	ラダロウ'TEV'	
+h:efe52e995a0b32d3	キャノン'DET'	
+h:f075d7584926cfd2	リバー(英建造)	
+h:f0b3c25703dc1c82	アンシュウ丸 AKE	カナ（漢字不明）
+h:f102ddc85a5610f5	長門	
+h:f117c3c85a6840d1	長良	
+h:f1225bc9ea788726	グロスター	
+h:f17c6c2e8579371d	木曽丸 AG	
+h:f18df7082d65e708	バックレイ	
+h:f19a257d25cea9c4	ウィックス APD	
+h:f238878f650d80ac	箱根丸	
+h:f274fcdc1afb9d8a	リマ丸 AKV	
+h:f2750bdc1afbb707	リマ丸 AKE	
+h:f2eb9b0bbedef701	木曽丸 xPB	
+h:f301e5daf43bfef2	戦車揚陸艇	
+h:f323d3e5b069de06	フレッチャーLB対空	
+h:f36cccb73bad84b8	ベンハム	
+h:f3a83931ce0be66d	郵船N型貨物船	
+h:f3efe1dbc56431cc	1TS型	
+h:f3eff7dbc564572e	1TM型	
+h:f3eff8dbc56458e1	1TL型	
+h:f3f55b2e4dd125d0	コタ兵員輸送船	
+h:f4239cb901143a1d	C3デルタ	
+h:f4327def8c886ca9	バーンズ/ユニオン	
+h:f47bf1a08744c8cc	HA型 LSI/LST	
+h:f48824a087584345	ベイ PFAA	
+h:f491c07358c89703	ダイドー	
+h:f49d7da544258174	ゴザン丸 貨物船	カナ（漢字不明）
+h:f4fe00e67a83e325	マジェスティック	
+h:f50fa812e4ee2f21	オイスターベイ	
+h:f5380d0d68211061	トロンプ	
+h:f568cc04e2389891	ETC M型	
+h:f5b687b88c3cbb42	ビクトリー AKE	
+h:f5be1e646f01e215	英海軍/デール AO	
+h:f6156eca794782bf	'T'級1941/42年	
+h:f619555f051353fb	バセット	
+h:f7149e7b92e732dd	小型 AP(連合軍)	
+h:f731bdd3ce8f7478	バトル級第1群	
+h:f7c4f7558b15cee3	ブエノスアイレス AS	
+h:f7c9039ea0c15d6c	フレッチャー級HB	
+h:f7c9119d6772c397	アドミラルティ嚮導	
+h:f7d61b9ea0cc1090	フレッチャー級LB	
+h:f7d8d6147f552812	アドミラルティ AO	
+h:f8abbd2dc57dbde5	'R'	
+h:f96234e2262ce424	山陽丸	
+h:f9e7da19a0367fb0	オーク	
+h:fa446d4ca77444b2	エクセター	
+h:fa4a36cf8a681bad	アリステウス	
+h:fa65d20903fd4728	神州丸	
+h:fa83d5f89b1abfc1	'D'級デリー	
+h:fabfaae1b5d2244c	鳳翔	
+h:fadc85a5abb20b00	厳島	
+h:fb82f2406e2206b1	B1モーターランチ	
+h:fb93294a92a8ba75	潜輸丁型(D1/2)	
+h:fbc34619653f85ab	ル・ファンタスク	
+h:fbdff41fd617afcc	金剛丸	
+h:fcd4b713dd71ca49	BTC L型	
+h:fd9d49d9a365c01c	コロッサス	
+h:ff2e4f629180f186	ウィックス DE	
+h:ff2e50629180f339	ウィックス DD	
+h:ffa789494c3c2cec	潜補(SH)	
+h:ffa79d494c3c4ee8	潜高(ST)	
+h:ffa7a4494c3c5acd	潜輸小(SS)	
+h:ffc982494c59076d	まるゆ	
+h:ffd726301644badd	グレン LSI	
+h:ffda3a494c670048	潜輸丁型(D1)	
+h:ffda3d494c670561	潜輸丁型改(D2)	
+h:ffddc2494c6a1d37	巡潜丙型(C1)	
+h:ffddc3494c6a1eea	巡潜丙型(C2)	
+h:ffddc4494c6a209d	巡潜丙型改(C3)	
+h:ffe144494c6d2ff4	巡潜乙型改2(B3)	
+h:ffe145494c6d31a7	巡潜乙型改1(B2)	
+h:ffe146494c6d335a	巡潜乙型(B1)	
+h:ffe44a494c6f6ffd	巡潜甲型改2(AM)	
+h:ffe4ab494c7014d0	巡潜甲型改1(A2)	
+h:ffe4ae494c7019e9	巡潜甲型(A1)	
+h:fff5af494c7e8ecf	L4型	
+h:fff894494c8096c5	潜小(KS)	
+h:fff8ae494c80c2f3	海中5型(K5)	
+h:fff8af494c80c4a6	海中6型(K6)	
+h:fffc34494c83dc7c	巡潜3型(J3)	
+h:fffc35494c83de2f	巡潜2型(J2)	
+h:fffc36494c83dfe2	巡潜1型(J1)	

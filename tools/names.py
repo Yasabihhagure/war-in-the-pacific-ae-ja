@@ -10,6 +10,9 @@
 使い方:
   python tools/names.py export   # 編集用の対訳表を作る (今の日本語を入れて)
   python tools/names.py import   # 編集用の対訳表の日本語とメモを、公開する対訳表に書き戻す
+  python tools/names.py batch 種類 [件数]  # 訳していない名前を work/names/batches/<種類>_NNN.tsv に分ける (既定 400)
+  python tools/names.py verify FILE        # 訳のファイル <種類>_NNN.out.tsv (key<TAB>日本語<TAB>メモ) を検査する
+  python tools/names.py merge              # 訳のファイルを編集用の対訳表に入れ、公開する対訳表に書き戻す
 """
 import glob
 import os
@@ -137,12 +140,118 @@ def do_import():
         print("%-13s %d entries" % (kind, sum(1 for v in pub.values() if v[0])))
 
 
+BATCHES = os.path.join(WORK, "batches")
+
+
+def read_work(kind):
+    """編集用の対訳表 -> (見出し, 行のリスト)"""
+    with open(os.path.join(WORK, kind + ".tsv"), encoding="utf-8") as f:
+        head = next(f).rstrip("\r\n").split("\t")
+        rows = []
+        for line in f:
+            col = line.rstrip("\r\n").split("\t")
+            rows.append(col + [""] * (len(head) - len(col)))
+    return head, rows
+
+
+def write_work(kind, head, rows):
+    with open(os.path.join(WORK, kind + ".tsv"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("\t".join(head) + "\n")
+        for r in rows:
+            f.write("\t".join(r) + "\n")
+
+
+def make_batches(kind, size):
+    """訳していない名前を work/names/batches/<種類>_NNN.tsv (key, english, count) に分ける"""
+    head, rows = read_work(kind)
+    ik, ie, ij, ic = head.index("key"), head.index("english"), head.index("ja"), head.index("count")
+    todo = [r for r in rows if r[ie] and not r[ij]]
+    os.makedirs(BATCHES, exist_ok=True)
+    n = 0
+    for i in range(0, len(todo), size):
+        n += 1
+        with open(os.path.join(BATCHES, "%s_%03d.tsv" % (kind, n)), "w", encoding="utf-8", newline="\n") as f:
+            f.write("key\tenglish\tcount\n")
+            for r in todo[i:i + size]:
+                f.write("%s\t%s\t%s\n" % (r[ik], r[ie], r[ic]))
+    print("%s: %d names -> %d batches" % (kind, len(todo), n))
+
+
+def check_out(path, english):
+    """訳のファイル (key<TAB>日本語<TAB>メモ) を検査し、(訳の辞書, 問題の一覧) を返す"""
+    out, probs = {}, []
+    with open(path, encoding="utf-8-sig") as f:
+        for no, line in enumerate(f, 1):
+            line = line.rstrip("\r\n")
+            if not line or line.startswith("#") or line.startswith("key\t"):
+                continue
+            col = (line.split("\t") + ["", ""])[:3]
+            k, ja, memo = col
+            if k not in english:
+                probs.append("%d行目: 知らないキー %s" % (no, k))
+                continue
+            if not ja:
+                continue
+            try:
+                b = ja.encode("cp932")
+            except UnicodeEncodeError:
+                probs.append("%d行目: CP932 にない文字 %r" % (no, ja))
+                continue
+            if len(b) > 19:
+                probs.append("%d行目: 19 バイトを超える (%d) %s" % (no, len(b), ja))
+            if "~" in ja or "～" in ja or "%" in ja:
+                probs.append("%d行目: ~ や %% がある %s" % (no, ja))
+            out[k] = (ja, memo)
+    return out, probs
+
+
+def merge_batches():
+    """work/names/batches/<種類>_NNN.out.tsv の訳を編集用の対訳表に入れ、公開する対訳表に書き戻す"""
+    for kind in KINDS:
+        files = sorted(glob.glob(os.path.join(BATCHES, kind + "_[0-9][0-9][0-9].out.tsv")))
+        if not files:
+            continue
+        head, rows = read_work(kind)
+        ik, ie, ij, im = head.index("key"), head.index("english"), head.index("ja"), head.index("memo")
+        english = {r[ik]: r[ie] for r in rows}
+        got = {}
+        for p in files:
+            out, probs = check_out(p, english)
+            for msg in probs:
+                print("%s: %s" % (os.path.basename(p), msg))
+            got.update(out)
+        n = 0
+        for r in rows:
+            if r[ik] in got and not r[ij]:
+                r[ij], memo = got[r[ik]]
+                if memo and not r[im]:
+                    r[im] = memo
+                n += 1
+        write_work(kind, head, rows)
+        print("%s: merged %d from %d files" % (kind, n, len(files)))
+    do_import()
+
+
 def main():
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 日本語を含む結果の表示で止まらないように
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
     if cmd == "export":
         export()
     elif cmd == "import":
         do_import()
+    elif cmd == "batch":
+        make_batches(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 400)
+    elif cmd == "verify":
+        kind = os.path.basename(sys.argv[2]).rsplit("_", 1)[0]
+        head, rows = read_work(kind)
+        english = {r[head.index("key")]: r[head.index("english")] for r in rows}
+        out, probs = check_out(sys.argv[2], english)
+        for msg in probs:
+            print(msg)
+        print("%d translations, %s" % (len(out), "OK" if not probs else "%d problems" % len(probs)))
+        sys.exit(1 if probs else 0)
+    elif cmd == "merge":
+        merge_batches()
     else:
         print(__doc__)
 

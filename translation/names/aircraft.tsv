@@ -1,13 +1,34 @@
 # 航空機の型式 の対訳。key\t日本語\tメモ。key は英語名の FNV-1a 64bit (tools/names.py)
 h:00bc0668002b9297	百式司偵改	要確認: 防空戦闘機型
+h:00dc33e6e50aabfc	ワピティ IIa	
+h:00dc53e6e50ae25c	ワピティ IIA	
 h:00e8aac00e992605	九七重爆一型丙	
+h:022b7af6da249949	A-24B バンシー	
+h:02f2db28dbf320bf	TBM-1C アベンジャー	
+h:02f95bd30a58e155	PBJ-1D ミッチェル	
+h:03fa66eddbe150a4	P-66 ヴァンガード	
+h:04aa2dbfbcfe281f	シーファイア IIC	
+h:04aa37bfbcfe391d	シーファイア III	
 h:04dbfd8bd2a5ff1a	疾風高高度型	要確認
+h:052ee4b0c6ebe9ae	サンダーランド GR.V	
 h:0562506884ecce2a	三式指揮連絡機	
+h:060cc1a8a209fb0d	B-25J11 ミッチェル	
 h:0616ce48fa2099bb	二式高練甲	
+h:0635de26e70cd1b2	ハドソン IIIa	
+h:0635fe26e70d0812	ハドソン IIIA	
+h:067587807b8eb8ff	リベレーター GR.VI	
+h:06b159684a07f39f	B-17E フォートレス	
+h:06c17d01c3fc0fb7	R5C-1 コマンドー	
 h:06e7d953a6a5876a	九六艦爆	
+h:081385c3b77b537a	アラド AR-196	
+h:081994203005d607	TBF-1 アベンジャー	
+h:08c0bb875115d56a	P-43 ランサー	
 h:08f0c20c80d50a76	隼一型甲	
+h:09f830266c7cc63e	フルマー II	
+h:0ae886d7362c2736	MC-21輸送機	
 h:0b625a8e6674316f	零式水偵	
 h:0ce515458516f335	零戦夜戦型	要確認: 五二型の夜間戦闘機型
+h:0d33a33fa80007f9	F-6D マスタング	
 h:0d39fb45855f0706	零戦夜戦型	要確認: 五二型の夜間戦闘機型
 h:0e1d146d2e3c2448	九七艦攻一号	
 h:0ebafb9cb5c1406d	キ83	
@@ -15,132 +36,388 @@ h:0ebe799cb5c44c5e	キ95
 h:104a7c716a181155	零戦二一型	
 h:10cc38f2449ebf8b	九七大艇二三型	
 h:119780bf5d0ec71b	彩雲一一型	
+h:126e353e0fa5e953	P-38J ライトニング	
 h:131093e54dfeb3ff	九七司偵二型	
+h:132270faa8c7ed13	P-51D マスタング	
+h:1370daf1e4c676d6	スピット VIII	長さのため「スピットファイア」を略
+h:13889d5920733c52	P-38E ライトニング	
+h:13d0768bd76b3c36	P-39D エアラコブラ	
+h:144bfcd16ff7cb52	ハリケーン IIa Trop	
 h:14751b33c3eaf3d3	九七大艇(輸送)	九七式輸送飛行艇
+h:14b37465daa8981b	電光	S1A2（電光の改良型案）
 h:166dcbb48f469c6e	二式大艇一二型	
 h:1674cc4903203931	キ119	
 h:16f3abb71dbc5db2	一式貨物輸送機	
+h:1723b0ae1029bc7b	P-40N ウォーホーク	
 h:1743818edbbd0a65	彗星三三型	
+h:175d77aa00c9e62d	C-47 スカイトレイン	
+h:1789704a871d7b44	B-10B マーチン	
+h:178a606f7f9eab63	モホーク IV	
 h:18143046e88b2431	百式司偵二型	
+h:18691ee946af71f5	B-25H ミッチェル	
+h:1a6ab7194391174d	A-26C インベーダー	
 h:1abafc6254559549	九七大艇二二型輸送	要確認
+h:1c3d6d55fbfc5b08	F-7A リベレーター	
+h:1c41a77ac742244d	モスキート PR.34	
+h:1c52a17ac7508d4e	モスキート PR.40	
+h:1c52a27ac7508f01	モスキート PR.41	
+h:1c672b26b4b422bf	ライサンダー II	
+h:1c6c3275d7ea81a6	ボリングブローク IV	
+h:1da9777ac8737bc3	モスキート PR.IX	
 h:201d16b357318d72	天山一二型	
+h:20ba384b11599af5	R5C コマンドー	
+h:219357f130099c65	C-46D コマンドー	
 h:234232e50db9d1a7	飛龍一型(雷撃)	
+h:23b8300816265894	スピット F.XIV	長さのため「スピットファイア」を略
+h:23c33c81dc89b0a9	PBJ-1H ミッチェル	
 h:24e576ddf156928a	キ109	特殊防空戦闘機
+h:252c5899fc8443d6	F4U-2 コルセア	
+h:255a375a07805744	P-40N1 ウォーホーク	
+h:25ec3aefdb5bbac3	白菊	
+h:27011068998a42f7	P-40B ウォーホーク	
 h:274a584391992782	九五水偵	
+h:27e17f27fb6267c5	A-29 ハドソン	
+h:28027b50a656b9d4	ハリケーン I Trop	
 h:28308b9de64b2752	橘花	
+h:28d9d35cc56e912e	ボーフォート VIII	
+h:29c56d78da329c53	テンペスト F.2	
+h:2a1fc8c1bfc625c2	B-17D フォートレス	
+h:2bf21724ac352ab5	B-24M リベレーター	
 h:2ca232cd1a04936f	鍾馗二型乙	
+h:2cee00046264370a	PV-1N ベンチュラ	
+h:2cf1135451ca9199	ビーチ 18-S	
+h:2df4eb0b40c43053	P-43A-1 ランサー	
+h:2f4326e642179dc1	フェアリー バトル	
 h:2f5ede69efd68e2c	キ93乙	
 h:2f5ee169efd69345	キ93甲	
+h:3016a4fbe8ec9144	SB2C-5 ヘルダイバー	
+h:33c3df7a2f5c4806	アベンジャー I	
 h:33ed760bd8edf504	彗星一二型	
 h:343ff3c864815318	呑龍二型乙	
+h:344a7689da1b96e6	S-23 エンパイア	
+h:3502da57b0539911	PBY-5 カタリナ	
+h:363cd1c55de53178	F4U-4 コルセア	
+h:3644afb826b155a4	シンガポール III	
+h:3666751971241905	75A-7 ホーク	
+h:36a24b766689b167	SBD-1 ドーントレス	
+h:3706672c35e7ec30	ハリケーン XIIB	
+h:3706872c35e82290	ハリケーン XIIb	
+h:375496ea254334bb	A-20A ハボック (FM)	
+h:37a1471164c2ccbd	マスタング IV	
+h:3816175a2f591f6f	オーダックス I	
 h:394952a21e6734b8	九九艦爆二二型	
 h:3ac4224dde1e21a4	九六艦戦四号	
 h:3b0ac6cec1fadff3	屠龍丁	
 h:3e75d94036e87768	九七軽爆	
+h:3f327bed52e8e8c1	バッファロー PR.I	
+h:3ff1fe5d212ce14b	ハリケーン IV	
+h:400ebe7305ff69b0	FR-1 ファイアボール	
 h:41c9d92a2dbe748d	剣甲	
 h:4200c51e47395811	飛龍一型乙	
+h:438f846482e922c8	F-6C マスタング	
+h:449a6a4ec3c84aae	ボーフォート V (PR)	
+h:461b2e75be37affb	ボーファイター X	
+h:477b82d86e194dbe	B-25Cミッチェル(FM)	
+h:47921c70f6c1bd39	モスキート FB.VI	
+h:47b1e1ef840c10c0	スピット PR.IV	長さのため「スピットファイア」を略
+h:47f0d570f711d918	モスキート FB.26	
+h:47f7c770f717dffc	モスキート FB.40	
 h:484ab732a7818797	隼一型乙	
+h:4869ff8e917be249	B-29-1 超空の要塞	スーパーフォートは長すぎるため日本での通称
+h:48e0e8ff97b3ab38	C-46A コマンドー	
+h:48ea32a24a4a605b	モスキート PR.XVI	
+h:48f7cb402719ea02	SBD-2 ドーントレス	
+h:496dfb0d713ff1a9	ストランラー II	
 h:497a28f94bd207fc	彗星夜戦	彗星一二戊型
+h:499440ef5bcf5cbd	C-63 ハドソン	
+h:49ee2689d852db68	TBM-3 アベンジャー	
+h:4a65625cfb3b9822	ダコタ III	
 h:4b5a47d38d11c61c	飛燕一型丙	
+h:4bbbcce3407ad2b0	P-38G ライトニング	
 h:4bf7dbebb0c214df	零戦六二型	
+h:4bffb99371b10102	A-20A1 ハボック	
 h:4c0a3442894fc915	極光	銀河の夜間戦闘機型
+h:4c49ccaf0f18b349	B-25D ミッチェル	
 h:4c4d05ebb10a9c3c	零戦六二型	
+h:4c8da1f0b45a3398	ブレニム IV	
+h:4c8db1f0b45a4ec8	ブレニム IF	
+h:4c96d05c4141ca12	O-49 ヴィジラント	
+h:4cb395f0b47aee71	ブレニム VD	
 h:4d0c71107642104f	二式艦偵	二式艦上偵察機
+h:4d2ce2aa0936d615	サンダーボルト I	
+h:4decfeff224ad5c8	P-47D2サンダボルト	長さのため「サンダーボルト」を略
+h:4e22e6d8cc6f5970	ハリケーン IIc Trop	
+h:4e84ba8d5a7230fd	B-26 マローダー	
+h:4fd7985264842e43	リベレーター GR.III	
+h:4ffaf96cc8ff04a0	B-24D-1リベレーター	
 h:4ffcc78ebe0836ac	九九襲撃機	
+h:50a87d156dab556b	ヴィルデビーストIII	
 h:50dc6aabc34c08e8	九八陸偵	
 h:516dbd6ceb6357bc	鍾馗二型丙	
+h:521d0b9e79cede3d	アベンジャー II	
+h:538df2c317b4b6dd	S.19シンガポールIII	
+h:53e921f6c7126b33	P-36A モホーク	
+h:53f150a4ffcde396	B-18A ボロ	
+h:54296d541d0938ae	シーガル V	
 h:5513a173e46e2fb0	紫電一一型	
+h:555a30c025602ae9	震電	
 h:556c783046206279	零式練戦	零式練習用戦闘機
 h:557275a6d655a99f	二式高練甲	
+h:56393248fa83ff1c	アベンジャー III	
 h:56929e2cc0a13998	九七大艇二二型	
+h:56ced8f351b92bb5	ヘルキャット I	
 h:5729e2a2fe5d8068	キ74	遠距離爆撃機
+h:572b49dd88347013	PV-2 ハープーン	
+h:57a575975dbae4a6	F6F-5 ヘルキャット	
+h:57a66a12386f63a1	ボーファイター IC	
+h:57a68a12386f9a01	ボーファイター Ic	
+h:57ea7c386247defb	スピット FR.XIVE	長さのため「スピットファイア」を略
+h:57ea9c386248155b	スピット FR.XIVe	長さのため「スピットファイア」を略
 h:589006a11a842d47	九七重爆一型丙	
+h:5911b81239a3c708	ボーファイター 21	
 h:592c76a3b868e605	一式双発輸送機	
+h:597ca47217adea83	DH-89 ラピード	ドラゴン・ラピードは長すぎるため略
+h:5a1b82eda82e3e54	サンダーボルト II	
+h:5a63c54687f2a490	P-40K ウォーホーク	
+h:5a7ffcfb3a1f16b4	藤花	剣（キ115）の海軍型
+h:5aad31d6ad56af4a	ボーフォート V (PR)	
+h:5aceaf870a75e03b	ハリケーン IID Trop	
+h:5afbde56fc94ed50	ハドソン C.IV	
+h:5bc9f5d1cbc14cff	P-70A-1 ハボック	
+h:5c8e63f19d7ad979	B-17G フォートレス	
 h:5c98d25c4a3f57a2	彗星四三型	
+h:5d8e57db522e6043	SBD-5 ドーントレス	
+h:5f06701797c889ac	R4D-5スカイトレイン	
+h:5f691a05386ba279	ステアマン 75M	
+h:60aaee135b4c39f9	PBY-6A カタリナ	
+h:60c85a934f1917fb	CW-22 ファルコン	
 h:614db7afdbe45542	一式双練乙	
+h:627c0bd276023e26	コルセア II	
+h:627c26d276026c07	コルセア IV	
 h:62e6f5ce5f1b7e21	九九艦爆一一型	
+h:636505778e558a2d	SOC-1 シーガル	
+h:639856fa670efd3f	ミッチェル PR.II	
+h:64a12ba36d3c42f1	サンダーランドC.III	
+h:64d41f65a4b3cfa5	ファイアフライ F.I	
 h:6530bf5f2eaaa5a7	百式司偵三型改	防空戦闘機型
+h:65bbe839a36e425e	ブレニム I	
 h:6714706bacfb50bc	一式陸攻二四丁型	桜花の母機
 h:67dfa5183c167c42	百式司偵三型乙	
+h:690336656590cfef	A-20G ボストン	
 h:69231000f109a0bd	九八直協	
+h:69448a730bc67a94	ウェリントン Ic	
+h:6944aa730bc6b0f4	ウェリントン IC	
+h:69b446995671b8b2	SB2C-3 ヘルダイバー	
+h:69e83b77d97eaa79	ワイルドキャット V	
 h:6a82658a1e2a59af	飛燕二型改	
 h:6aa8ef7f612f4272	秋水	
+h:6af32e1866203e57	P-51H マスタング	
 h:6b9cbf0f598c8312	九九軍偵	要確認
+h:6ba48a9caff5199c	カンソー A	
+h:6c9ffaa1aa3f07d6	B-25G ミッチェル	
+h:6e1c59507a6cd5ba	シーファイア XV	
+h:6e9edcb3a5ef3df6	シーファイア F.XV	
+h:6f2611b717854e47	ファイアフライ FR.I	
 h:6f4030d64323cb4e	零戦五二型丙	
 h:6f8e26d64365dba1	零戦五二型丙	
+h:6fd9ded5877f7625	F2A-3 バッファロー	
+h:702f12e3b7ef70d9	A-20A ハボック	
 h:713b5ceded03b8f0	銀河一一型	
+h:71906d46afe87914	F-5E ライトニング	
+h:719285fdcb250fe8	F2A-2P バッファロー	
+h:72aef6ade67b3829	A-24 バンシー	
+h:734b78d4525796ea	バッファロー 439D	
 h:734edcff25b83953	隼四型	要確認: 計画のみ
 h:7394991dd5c8e561	呑龍二型改	
+h:74473ca6923b2f90	ワイルドキャット VI	
+h:745ebaae307643f5	バッファロー I	
+h:746dccf628ef88a4	P-51A マスタング	
+h:751ceb0bebb34733	P-40N26ウォーホーク	
 h:753b2492ae61d3c1	百式輸送機一型	
 h:75dbff99d2a0173e	百式司偵一型	
+h:760d4674bffe689a	ヘルキャット NF.II	
 h:77fe490aa6494b49	月光一一甲型	
 h:784b04a1f9fc8580	屠龍丙	
 h:784ffb27878a2b94	零戦五二型乙	
+h:788b09a0b19d739f	B-26B マローダー	
 h:789ee12787cdd3b7	零戦五二型乙	
+h:796bb0ce782fca52	P-400 エアラコブラ	
 h:79cb084a00586598	百式司偵三型	
+h:7a327b7898e40846	PB4Y-1Pリベレーター	
 h:7a7135b031ba7d99	九四水偵	
+h:7b4405f39c53c911	キティホーク IA	
+h:7b4416f39c53e5f4	キティホーク IV	
+h:7bacb2644ce2a1c9	F-5B ライトニング	
 h:7c5483e8330c6084	九九襲撃機	
+h:7c7b6dc202dee2e6	P-39N2 エアラコブラ	
 h:7c7e8653640a24a7	飛燕一型丁	
+h:7cb5beaf4eb49333	ワイラウェイ	
+h:7dd3f5d5ae6de3bf	スピット VC Trop	長さのため「スピットファイア」を略
+h:7ede8496e49d4185	LB-30 リベレーター	
 h:7ede97e39a20ea39	零戦二二型	
+h:7f7118ebd830e13b	ホーク 75M	
+h:7f88e37bcce37bfa	B-25C ミッチェル	
+h:7fe1fc43fb8de928	F6F-3N ヘルキャット	
+h:8054d0ac078a9b16	シーハリケーン IB	
+h:8054f0ac078ad176	シーハリケーン Ib	
+h:8068aecd530ddca0	PBM-5 マリナー	
 h:810e9f20235707bf	彩雲夜戦	要確認: 夜間戦闘機型
+h:8123dadf233320bc	F6F-3 ヘルキャット	
+h:830ce5722d2b82ab	ファイアフライ NF.I	
+h:87462739dec4bd6d	カタリナ VI	
+h:87e49a517290f63f	A-20G ハボック	
 h:8886d40bb046d3b4	零戦二一型爆戦	爆装した零戦
+h:88a9426890dd3a91	マートレット IV	
+h:88a94b6890dd49dc	マートレット II	
 h:890d968b39ff09ad	流星改	
+h:891736f4a325823e	B-24D リベレーター	
+h:89a0d17bc7626b68	PBY-5A カタリナ	
+h:89d9d90844c870d9	PB2Y-3R コロナド	
+h:8a4468116b1bf13e	B-32 ドミネーター	
+h:8b227a242bf8f625	A-36 マスタング	
+h:8bd7275bb3c41022	コルセア V	
+h:8ce947630c376ab2	F2A-2 バッファロー	
 h:8d3b1978a3cdb3e1	烈風改	
 h:8d4fdd2b3442dafe	キ102甲	高高度戦闘機型
+h:8d96fb6b75666973	ウォーラス II	
+h:8e6a0ebecaeaa0a7	F4U-1D コルセア	
+h:8f5448cf5b9ec720	ウェリントンGR.XIII	
 h:90925c3a8f2f5994	紫雲	
+h:912ddfa7c0063e55	F-13 超空の要塞	B-29の偵察型。スーパーフォートレスは長すぎる
+h:9183441245f714eb	A-20C ボストン	
+h:9183cf0964586a88	P-40N5 ウォーホーク	
+h:933641dbf4994c3a	ヴェンジェンス I	
+h:940448b70a0c4bff	F2G-1 コルセア	
 h:94cd74943f288a6c	彗星一二型偵察機	
+h:950c672873c81b45	P-38H ライトニング	
 h:9621367862e4b6ab	四式襲撃機	キ102乙
+h:964b430572a413c9	P-51B マスタング	
 h:976a38d3ff55e530	九九双軽二型甲	
+h:97dfa1fe29972129	PB2Y-5 コロナド	
 h:97fe378e352f4649	天山一一型	
+h:98c1e72ce41b76f8	カタリナ IIIA	
 h:98d47f32c233123f	九七艦攻二号	三菱製の九七式二号艦上攻撃機
+h:993ec37d401d36ba	F-4 ライトニング	
+h:997415a3231b350b	リベレーター II	
 h:998c6bf5310d6fdd	一式陸攻三四型	要確認
+h:99dd5da32374986c	リベレーター VI	
 h:99e0b9b1687e33de	呑龍一型	
+h:9a02d3a0b6dfe3e9	B-24D1 リベレーター	
 h:9be41690f9a7779d	秋水改	キ202
 h:9c35d4e77109eceb	東海	
 h:9e0967404f5cc0fc	雷電二一型	
+h:9e361f0989173ba6	ブーメラン C-12	
+h:9e3626098917478b	ブーメラン C-19	
+h:9eed80301a9d67fa	F6F-5N ヘルキャット	
+h:a08f877b1e77d6d7	リンカーン B.1	
+h:a0eeaa85a3db85cd	ヴィルデビースト IV	
 h:a2c34ba4611f1694	一式輸送機	
+h:a3a12cce6fb2334b	DH-84 ドラゴン	
+h:a3f47d3a01e99a57	L-18 ロードスター	
 h:a52544062efe1b3d	火龍	
+h:a5a6f806c3ed5c5d	ベンチュラ GR.V	
+h:a6a4616e93a823bf	F-10 ミッチェル	
+h:a6efba93ec856b00	F6F-5P ヘルキャット	
+h:a77f3bcf83402a48	PBY-4 カタリナ	
 h:a7cc6cd91b4e5dc4	紫電改五	試作
 h:a8024a4de1bd4e23	九七艦攻三号	
 h:a8aef0f67cd99511	九六陸攻二二型	要確認: 二一型の可能性
+h:a91fa772818dff35	ハドソン I	
+h:a9aa5bb8c49ebd26	R4D スカイトレイン	
+h:aa043544a85c303d	ハリケーン IIb Trop	
+h:aa289626f6e11b64	P-70 ハボック	
 h:aa93fee48596f17b	晴空	二式大艇の輸送機型
 h:aaab64ce6fab8521	一式陸攻(輸送)	輸送機型
+h:ac59da7ec3521ca8	TBD-1デバステーター	
 h:ac85440a6a2f6249	銀河一六型	
 h:ae68617383897c43	九七戦乙	
 h:aebe7c49d33884a1	零観	零式観測機
 h:af6788070b00af8a	疾風乙	
+h:b089e3240e505175	アンソン I	
+h:b0ed7e2fc58424fe	Do J ワール	
+h:b20612de9a257529	ランカスターB.1特殊	
+h:b234201c99cae5a7	F8F-1 ベアキャット	
 h:b245a52b83cfe692	二式陸偵	二式陸上偵察機
+h:b3fb01bdfe8c747d	SBC-4 ヘルダイバー	
+h:b40fe5f455801eff	シャーク III	
 h:b47492de60ccd25f	カ号観測機	
 h:b47cf2bf879f7932	百式輸送機二型	
 h:b6d55f8bff0f5742	月光一一型	
+h:b74e88dd9678ece4	F4U-1A コルセア	
+h:b753613d02ccc59e	A-26B インベーダー	
 h:b76fb906d6f374d8	剣乙	
+h:b7f1cb0188a5555f	スピット Vc Trop	長さのため「スピットファイア」を略
+h:b8632a0c45141d62	リベレーター B.III	
 h:b86d6312cd019752	銀河三三型	要確認
+h:b903ce7d072bb746	PV-1 ベンチュラ	
+h:bb02e1c44911734f	PBJ-1J ミッチェル	
 h:bb2b3ea42639f7dc	九六陸攻二三型	
+h:bb7c226a43278318	ヘルキャット F.II	
+h:bbef1820915f4027	シーファイア L.III	
 h:bd3d54884dc66cb5	零式輸送機	
+h:bd5af8e391c96644	ランカスター B.1 FE	
+h:be7e02c0a07c502e	ヴェンジェンス I	
+h:be7e54c0a07cdb84	ヴェンジェンス IV	
 h:be8fde29450b8f77	疾風甲	
+h:bf743bf70d3aa610	CW-21B デーモン	
+h:bfefee8ada05f9f1	ボーフォート V	
+h:bfeff78ada06093c	ボーフォート I	
 h:c024a6db45997cf8	隼一型丙	
+h:c06aace485aa91c8	ロードスター 18	
 h:c0a0b02a66377b5c	零戦二一型爆戦	爆装した零戦
 h:c1b90d20b7d872f0	一式陸攻一一型	
 h:c276dd610d4fee5e	九七重爆二型甲	
+h:c29bdf2cee4efcf3	B-25B ミッチェル	
 h:c34856dc4ea3ea1c	飛龍一型甲	
 h:c39aa961b74574ea	キ94-II	
 h:c3ac69686008e4b1	隼二型甲	
+h:c463919f3316280b	SB2C-4 ヘルダイバー	
+h:c4d7e2b64df9aa9b	ハリケーン IId Trop	
 h:c52d7afc664e56cc	キ102丙	夜間戦闘機型
+h:c603ceb358df3917	PB2Y-3 コロナド	
 h:c684c340ca08f576	九九高練	
-h:c7084a7f90dbb5e8	零戦三二型	連合軍は当初 Hamp と呼んだ
+h:c6bc9a359102e663	ヴィンセント I	
+h:c6db407bb0a545d6	ウェリントンGR.VIII	
+h:c7084a7f90dbb5e8	零戦三二型	
+h:c807dd3acfe09310	スピット PR.XI	長さのため「スピットファイア」を略
+h:c83aca3ad00bcc60	スピット PR.IV	長さのため「スピットファイア」を略
+h:c83f555b60099ae9	アルバコア I	
 h:c83fa862ab8ab68b	九九双軽二型乙	
+h:c843b4f2a2471290	キティホーク III	
+h:c8de5323c0f3d01e	SBD-6 ドーントレス	
+h:c8fcc1ff2f55a102	P-40E ウォーホーク	
+h:cb2a36e6921ce98e	B-25D1 ミッチェル	
+h:cbb32940ca95e305	ボーファイター TF.X	
+h:cd60861822413a49	バラクーダ TR.III	
+h:ce685f8f0b02f4b3	F4U-1 コルセア	
 h:cf45d5410c8993d7	零式輸送機	
 h:cf8235cae79dd129	一式陸攻二二型	
+h:d0336a9f5ebcb780	PBM-3R マリナー	
+h:d0cc6af5e29d7ab8	リベレーター C.VII	
+h:d1a535f8f282fe8b	P-39N1 エアラコブラ	
+h:d2756605c9ebcbd2	PB4Y-1 リベレーター	
 h:d2c786bbf550d928	一式陸攻二四型	
+h:d3d75e0ab0fd2e77	SB2C-1Cヘルダイバー	
+h:d5314a9030702f20	A-29A ハドソン	
+h:d5746b6288c7f640	ハドソン III (LR)	
 h:d5d75e5caa2d9a71	飛龍一型(雷撃)	
 h:d5fb6725c9a15e23	強風	
+h:d625286118202004	ミッチェル III	
 h:d62c09f0de54f25c	晴嵐	
+h:d6fb70a0c45bd487	C-54 スカイマスター	
 h:d77136ebd205c173	二式大艇一一型	
 h:d787f1296bba5322	雷電三三型	
+h:d7fd0ea708a0fd5f	B-29B 超空の要塞	スーパーフォートは長すぎるため日本での通称
+h:d8772d7331005fb0	FR-1 ファイアボール	
 h:d8b53d3215b32b46	鍾馗二型甲	
 h:da0ab497b7ac7175	鍾馗二型乙	
 h:da4e1bd841afbf5a	九九双軽二型丙	
 h:dad655f1ee2c5b95	零式小型水偵	
+h:db31af3f885bffa2	ハリケーン FR.IIb	
+h:db31b03f885c0155	ハリケーン FR.IIc	
+h:db31cf3f885c3602	ハリケーン FR.IIB	
+h:db31d03f885c37b5	ハリケーン FR.IIC	
+h:db681349808608a4	サンダーランド III	
 h:db729d7573a5d1ff	彗星一一型	
 h:dbb930220a734ea1	零式水偵(電探)	要確認: 電探搭載型
 h:dc33dc897d59f412	屠龍甲	
@@ -148,27 +425,72 @@ h:dc748c00a1652636	鍾馗一型
 h:dd077e83e76a2d20	九九双軽一型乙	
 h:dd5d59f416f885a3	九七重爆二型乙	
 h:de31b4b13f61a6f0	五式戦二型	
+h:de3d61daa5df56e3	ホーク 75A-7	
+h:de5fc9c5b59e806a	キティホーク I	
 h:de8b473b80651497	紫電改	
+h:dec5bbffbea82010	ハリケーン IIC Trop	
+h:defa2cdea70baf7c	B-25J1 ミッチェル	
 h:df9f8299e791f871	瑞雲	
+h:dff89f61b4c78138	R4D-1スカイトレイン	
+h:e0f521a37666dee1	P-43A ランサー	
+h:e12568f62ee95316	ボーファイター VIF	
+h:e1256df62ee95b95	ボーファイター VIC	
+h:e12588f62ee98976	ボーファイター VIf	
+h:e1258df62ee991f5	ボーファイター VIc	
+h:e12b49c281e2b604	SO3C-2 シーミュー	
+h:e276bcc08e6bdd44	B-24J リベレーター	
+h:e2fc38b6d444337b	ソードフィッシュ I	
+h:e3f138849166ecb6	PBM-3D マリナー	
 h:e3f1752d72a15778	彩雲改	
+h:e42a130b29917a24	C-60A ロードスター	
+h:e5df7101d8017cdd	ハリケーン IIB Trop	
+h:e5ece600c578d17d	P-47D25サンダボルト	長さのため「サンダーボルト」を略
 h:e5f58f59552c3ea9	天山一二型甲	
+h:e66ecb0beeb519b8	F-5A ライトニング	
+h:e707fff0989b13ca	電光	
 h:e713bbaf08612329	呑龍二型甲	
 h:e765526f0d37ad29	飛燕一型乙	
+h:e86a2fcec9e9b5a5	ミッチェル II	
+h:ea1d0ce129bad7a9	P-70A ハボック	
+h:ea294faba1806eeb	サンダーランドC.III	
+h:eb0c80e0d7f09483	B-29-25 超空の要塞	スーパーフォートは長すぎるため日本での通称
 h:ebb8b1cf1bb6a7e2	二式水戦	
 h:ecb046e89f2600df	九五中練	
 h:ecb3da7f20d8e767	九六陸上輸送機	
+h:ecd683487f4bf5f8	TBF-1C アベンジャー	
+h:ee5ccc596e110839	P-38L ライトニング	
+h:ef027520d9633cdf	P-38F ライトニング	
+h:f096b42861184bd1	S.23 エンパイア	
+h:f0e0cdd220338258	リベレーター B.VI	
 h:f1ba7bbef1e17fd1	九六艦攻	
 h:f22bc50ff2b20520	明星改	
+h:f24308f32c0a345d	SBD-3 ドーントレス	
+h:f25ee661bb605fef	マスタング IV	
 h:f2952580e27b2c45	烈風一一型	
+h:f2c90fdf6053a9d0	C-87 リベレーター	
 h:f30d4c1014759de8	零戦五四型	
 h:f32526101489ef37	零戦五四型	
 h:f4394675d87ba37e	飛燕一型甲	
+h:f4931c623c2d8858	ヘルキャット PR.II	
+h:f58fbe7d2fd2c95c	ウェリントン B.X	
 h:f6acafe8288828ad	屠龍乙	
+h:f6c790aaafe2fdf6	ソードフィッシュ II	
+h:f719c5e96462b22e	モスキート B.35	
+h:f73cb9ad2be80bae	C-47 ダコタ	
+h:f83c15272264943e	バラクーダ II	
+h:f85a810d14856b97	カタリナ I	
 h:f88c851ca04bfd3c	一式輸送機	
 h:f965234545bda15c	九八軽爆	
+h:fa292c4b5a901238	SNJ-3 テキサン	
+h:fa5e3cbea55d3472	ハリケーン IIA Trop	
+h:fa80dc26558548ca	P-47Nサンダーボルト	
 h:fab7c86a03a35b1c	隼三型甲	
 h:fb64d259b6a3da13	九三中練	赤とんぼ
+h:fba4c8f1b8306745	モスキート NF.XIX	
+h:fc74f1cba538ce99	ストランラー II	
+h:fcf44f38e871cd6a	ハリケーン PR.II	
 h:fdfba8f5f0e0fa09	雷電一一型	
+h:fe98a68fb30d7d84	B-17F フォートレス	
 h:ffab52e956e684ac	隼二型乙	
 h:ffd08a118c9ae95d	零戦五二型	
 h:ffd55a4224510177	五式戦一型	
