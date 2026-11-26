@@ -10,10 +10,11 @@
 #include <vector>
 #include <cstdio>
 #include <share.h>
+#include "common.h"
 
 // ---------------------------------------------------------------- 設定
-static char g_dir[MAX_PATH];        // ゲームのフォルダ (末尾に \ )
-static char g_fontFace[LF_FACESIZE] = "MS Gothic";
+char g_dir[MAX_PATH];        // ゲームのフォルダ (末尾に \ )
+char g_fontFace[LF_FACESIZE] = "MS Gothic";
 static int  g_fontCharset = SHIFTJIS_CHARSET;
 static int  g_heightAdjust = 0;
 static bool g_replaceFont = true;
@@ -33,7 +34,7 @@ static unsigned long long Fnv1a64(const char* s, int n) {
     return h;
 }
 
-static void LogLine(const char* fmt, ...) {
+void LogLine(const char* fmt, ...) {
     if (!g_log) return;
     va_list ap; va_start(ap, fmt);
     vfprintf(g_log, fmt, ap);
@@ -118,7 +119,7 @@ static void LoadIni() {
 }
 
 // 新しく見た文字列をログに残す
-static void Seen(const char* tag, const char* s, int n) {
+void Seen(const char* tag, const char* s, int n) {
     if (!g_logText || !s || n <= 0) return;
     std::string key(tag); key += '\t'; key.append(s, n);
     EnterCriticalSection(&g_cs);
@@ -127,7 +128,7 @@ static void Seen(const char* tag, const char* s, int n) {
 }
 
 // 訳文を引く。見つからなければ nullptr
-static const std::string* Lookup(const char* s, int n) {
+const std::string* Lookup(const char* s, int n) {
     if (!g_translate || !s || n <= 0) return nullptr;
     if (g_dict.empty()) return nullptr;
     auto it = g_dict.find(Fnv1a64(s, n));
@@ -293,6 +294,8 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
         LoadReal();
         LoadDict();
         InstallHooks();
+        if (GetPrivateProfileIntA("Text", "GameHooks", 1, (std::string(g_dir) + "witpae_ja.ini").c_str()))
+            InstallGameHooks();
     }
     return TRUE;
 }
