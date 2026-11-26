@@ -17,6 +17,8 @@
   python tools/names.py surnames [件数]    # 人物の姓 (訳していないもの) を work/names/batches/surnames_NNN.tsv に分ける
   python tools/names.py surname-merge      # surnames_NNN.out.tsv の訳を translation/surnames.tsv に入れる
   python tools/names.py persons            # 姓の訳から leaders / pilots の訳 (姓の訳 + 頭文字) を組み立てる
+  python tools/names.py surname-export     # 編集用の姓の表 work/names/surnames.tsv (英語つき) を作る
+  python tools/names.py surname-import     # 編集用の姓の表を translation/surnames.tsv に書き戻し、人名を組み立て直す
 """
 import glob
 import os
@@ -420,6 +422,62 @@ def surname_merge():
     print("surnames: merged %d, total %d" % (n, sum(1 for v in d.values() if v[0])))
 
 
+SURNAME_SHEET = os.path.join(WORK, "surnames.tsv")
+
+
+def surname_export():
+    """編集用の姓の表 work/names/surnames.tsv (key, surname, ja, memo, count, examples) を作る"""
+    done = read_surnames()
+    info = {}
+    for kind in PERSON_KINDS:
+        head, rows = read_work(kind)
+        ie = head.index("english")
+        for r in rows:
+            if not r[ie]:
+                continue
+            s, _ = split_person(r[ie])
+            if not s:
+                continue
+            c, ex = info.get(s, (0, []))
+            if len(ex) < 3:
+                ex = ex + [r[ie]]
+            info[s] = (c + 1, ex)
+    os.makedirs(WORK, exist_ok=True)
+    with open(SURNAME_SHEET, "w", encoding="utf-8", newline="\n") as f:
+        f.write("key\tsurname\tja\tmemo\tcount\texamples\n")
+        for s in sorted(info, key=lambda x: x.lower()):
+            k = sheet.key_of(s.encode("latin-1"))
+            ja, memo = done.get(k, ("", ""))
+            c, ex = info[s]
+            f.write("%s\t%s\t%s\t%s\t%d\t%s\n" % (k, s, ja, memo, c, " / ".join(ex)))
+    print("wrote %s: %d surnames" % (SURNAME_SHEET, len(info)))
+
+
+def surname_import():
+    """work/names/surnames.tsv の ja と memo を translation/surnames.tsv に書き戻し、人名を組み立て直す"""
+    d = {}
+    with open(SURNAME_SHEET, encoding="utf-8-sig") as f:
+        head = next(f).rstrip("\r\n").split("\t")
+        ik, ij, im = head.index("key"), head.index("ja"), head.index("memo")
+        for no, line in enumerate(f, 2):
+            col = line.rstrip("\r\n").split("\t")
+            col += [""] * (len(head) - len(col))
+            ja, memo = col[ij].strip(), col[im].strip()
+            if not ja:
+                continue
+            try:
+                ok = len(ja.encode("cp932")) <= 19
+            except UnicodeEncodeError:
+                ok = False
+            if not ok or re.search(r"[~～%]", ja):
+                print("%d行目: CP932 にない文字、19 バイト超、または ~ % がある: %s" % (no, ja))
+                continue
+            d[col[ik]] = (ja, memo)
+    write_surnames(d)
+    print("surnames: %d" % len(d))
+    compose_persons()
+
+
 def compose_persons():
     """姓の訳から leaders / pilots の訳を組み立てる (手で入れた訳は上書きしない。前回の組み立ては作り直す)"""
     sur = read_surnames()
@@ -473,6 +531,10 @@ def main():
         surname_merge()
     elif cmd == "persons":
         compose_persons()
+    elif cmd == "surname-export":
+        surname_export()
+    elif cmd == "surname-import":
+        surname_import()
     else:
         print(__doc__)
 
