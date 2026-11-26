@@ -21,6 +21,7 @@ const RECT* const P_SCREENCLIP = (const RECT*)0xfe732ac; // clip が空で描く
 const DWORD A_WIDTH    = 0x7f43e0; // int  (const char* s, Font* font)
 const DWORD A_VSNPRINT = 0x7f13c0; // int  (int size, char* buf, const char* fmt, va_list va)
 const DWORD A_SPRINTF  = 0x80f1ab; // int  (char* buf, const char* fmt, ...)  C 標準ライブラリ
+const DWORD A_VSPRINTF = 0x8111b0; // int  (char* buf, const char* fmt, va_list va)  C 標準ライブラリ
 
 void** const P_CURFONT = (void**)0xfe73458;  // 現在のフォント
 void** const P_SCREEN  = (void**)0xfe7369c;  // 既定の描画先サーフェス
@@ -162,6 +163,34 @@ bool HasSjisChar(const std::string& list, const char* p) {
     return false;
 }
 
+// ---------------------------------------------------------------- 名前の種類の見分け
+// シナリオのデータはファイルのままメモリに読み込まれる (0x54b790(path, 読み込み先)、0x54b8c0 付近)。
+// 文字列がその範囲にあれば、どの種類の名前かが分かるので、その種類の対訳表を先に引く
+// (同じ英語名でも、艦は「川内」、地名は「仙台」のように訳し分ける)。
+struct DataRange { DWORD begin, size; const char* kinds[2]; };
+const DataRange kRanges[] = {
+    { 0x3cbe1a8, 0x583220, { "ships", nullptr } },                 // wps
+    { 0x756c4a8, 0x152228, { "ship_classes", nullptr } },          // wpc
+    { 0x3159a88, 0x3b883c, { "places", "ground_units" } },         // wpl
+};
+
+const std::string* LookupAt(const char* s, int n) {
+    DWORD a = (DWORD)s;
+    for (const DataRange& r : kRanges) {
+        if (a - r.begin >= r.size) continue;
+        for (const char* k : r.kinds) {
+            if (!k) continue;
+            if (const std::string* t = LookupKind(k, s, n)) {
+                static int logged = 0;
+                if (logged < 10) { logged++; LogLine("[kind] %s at %p: %.*s", k, s, n, s); }
+                return t;
+            }
+        }
+        break;
+    }
+    return Lookup(s, n);
+}
+
 bool HasHigh(const char* s, int n) {
     for (int i = 0; i < n; i++) if ((BYTE)s[i] >= 0x80) return true;
     return false;
@@ -193,7 +222,7 @@ void __cdecl h_DrawLine(int x, int y, const char* s, void* target, RECT* clip) {
     if (!s || !*P_READY || !*P_CURFONT) { o_DrawLine(x, y, s, target, clip); return; }
     int n = (int)strlen(s);
     Seen("L", s, n);
-    if (const std::string* t = Lookup(s, n)) { s = t->c_str(); n = (int)t->size(); }
+    if (const std::string* t = LookupAt(s, n)) { s = t->c_str(); n = (int)t->size(); }
     if (!HasHigh(s, n)) { o_DrawLine(x, y, s, target, clip); return; }
 
     int cx = x, cy = y;
@@ -220,7 +249,7 @@ void __cdecl h_DrawLine(int x, int y, const char* s, void* target, RECT* clip) {
 int __cdecl h_Width(const char* s, void* font) {
     if (!s) return o_Width(s, font);
     int n = (int)strlen(s);
-    if (const std::string* t = Lookup(s, n)) { s = t->c_str(); n = (int)t->size(); }
+    if (const std::string* t = LookupAt(s, n)) { s = t->c_str(); n = (int)t->size(); }
     if (!HasHigh(s, n)) return o_Width(s, font);
     void* f = font ? font : *P_CURFONT;
     int w = 0;
@@ -412,7 +441,7 @@ bool IsFileFormat(const char* f) {
 const char* LookupArg(const char* s, int prec) {
     size_t n = strnlen(s, 1024);
     if (n == 0 || n >= 1024) return nullptr;
-    const std::string* t = Lookup(s, (int)n);
+    const std::string* t = LookupAt(s, (int)n);
     if (!t) return nullptr;
     if (prec < 0 || (int)t->size() <= prec) return t->c_str();
     unsigned long long key = (unsigned long long)(uintptr_t)t * 1024 + (unsigned)prec;
@@ -570,6 +599,19 @@ __attribute__((naked, used)) void s_Vsn() {
         "jmp *_t_Vsn\n\t");
 }
 
+// vsprintf (0x8111b0)。入口では [esp]=戻り先、[esp+4]=buf、[esp+8]=fmt、[esp+12]=va
+// 戦闘報告の行を組み立てる 0x505290 / 0x5051c0 付近から呼ばれる
+void* t_Vsprintf = nullptr;
+__attribute__((naked, used)) void s_Vsprintf() {
+    __asm__ __volatile__(
+        "pushl 12(%esp)\n\t"        // va
+        "pushl 12(%esp)\n\t"        // fmt (1つ積んだので +4 ずれている)
+        "call _TranslateFmtArgs\n\t"
+        "addl $8, %esp\n\t"
+        "movl %eax, 8(%esp)\n\t"
+        "jmp *_t_Vsprintf\n\t");
+}
+
 // 入口では [esp]=戻り先、[esp+4]=buf、[esp+8]=fmt、[esp+12]=可変長の引数の先頭
 __attribute__((naked, used)) void s_Sprintf() {
     __asm__ __volatile__(
@@ -599,6 +641,7 @@ void InstallGameHooks() {
         {"Width",    A_WIDTH,    "558b6c2408",                      5,  (void*)h_Width,    (void**)&o_Width},
         {"Vsnprintf", A_VSNPRINT, "81ec1c0f0000",                   6,  (void*)s_Vsn,      &t_Vsn},
         {"sprintf",  A_SPRINTF,  "558bec83ec20",                    6,  (void*)s_Sprintf,  &t_Sprintf},
+        {"vsprintf", A_VSPRINTF, "ff74240c6a00",                    6,  (void*)s_Vsprintf, &t_Vsprintf},
         {"Wrap",     A_WRAP,     "83ec185333db",                    6,  (void*)h_Wrap,     (void**)&o_Wrap},
     };
     for (auto& it : items) {

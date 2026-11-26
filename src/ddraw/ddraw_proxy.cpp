@@ -89,7 +89,10 @@ static std::string Utf8ToCp932(const std::string& u) {
 // キーは "h:" + 英文の FNV-1a 64bit を16桁の16進で書いたもの
 // 1つの対訳ファイルを読む。名前の対訳 (names\*.tsv) は、画面の文言 (ja.tsv) より後に読み、
 // 同じキーがあれば画面の文言のほうを優先する (prefer=false)
-static int LoadDictFile(const std::string& path, bool prefer) {
+// kind があれば、その種類の対訳表 (g_kindDict) にも入れる (同じ英語名が種類によって訳し分けられるように)
+static std::unordered_map<std::string, std::unordered_map<unsigned long long, std::string>> g_kindDict;
+
+static int LoadDictFile(const std::string& path, bool prefer, const char* kind = nullptr) {
     FILE* f = nullptr;
     if (fopen_s(&f, path.c_str(), "rb") != 0 || !f) return -1;
     char buf[8192];
@@ -105,8 +108,10 @@ static int LoadDictFile(const std::string& path, bool prefer) {
         while (true) { size_t q = line.find('\t', p); col.push_back(line.substr(p, q == std::string::npos ? std::string::npos : q - p)); if (q == std::string::npos) break; p = q + 1; }
         if (col.size() < 2 || col[1].empty() || col[0].size() != 18 || col[0].compare(0, 2, "h:") != 0) continue;
         unsigned long long k = strtoull(col[0].c_str() + 2, nullptr, 16);
+        std::string v = Utf8ToCp932(Unescape(col[1]));
+        if (kind) g_kindDict[kind][k] = v;
         if (!prefer && g_dict.count(k)) continue;
-        g_dict[k] = Utf8ToCp932(Unescape(col[1]));
+        g_dict[k] = v;
         n++;
     }
     fclose(f);
@@ -121,7 +126,9 @@ static void LoadDict() {
     HANDLE h = FindFirstFileA((dir + "names\\*.tsv").c_str(), &fd);
     if (h != INVALID_HANDLE_VALUE) {
         do {
-            int m = LoadDictFile(dir + "names\\" + fd.cFileName, false);
+            std::string kind(fd.cFileName);
+            kind = kind.substr(0, kind.size() - 4); // ".tsv" を外す
+            int m = LoadDictFile(dir + "names\\" + fd.cFileName, false, kind.c_str());
             LogLine("[dict] names\\%s: %d entries", fd.cFileName, m);
         } while (FindNextFileA(h, &fd));
         FindClose(h);
@@ -136,6 +143,14 @@ static void LoadDict() {
         fclose(f);
     }
     LogLine("[dict] unit_types.tsv: %u entries", (unsigned)g_unitTypes.size());
+}
+
+const std::string* LookupKind(const char* kind, const char* s, int n) {
+    if (!g_translate || !s || n <= 0) return nullptr;
+    auto d = g_kindDict.find(kind);
+    if (d == g_kindDict.end()) return nullptr;
+    auto it = d->second.find(Fnv1a64(s, n));
+    return it != d->second.end() ? &it->second : nullptr;
 }
 
 bool IsUnitType(const char* s) {

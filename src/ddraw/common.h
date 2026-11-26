@@ -12,6 +12,8 @@ void LogLine(const char* fmt, ...);
 void Seen(const char* tag, const char* s, int n);
 // 英文に対応する訳文 (CP932) を返す。なければ nullptr
 const std::string* Lookup(const char* s, int n);
+// 名前の対訳表 names\<kind>.tsv だけを引く (kind は "ships" など)。なければ nullptr
+const std::string* LookupKind(const char* kind, const char* s, int n);
 // s (英文) が地上部隊の種類 (Army、Base Force など。witpae_ja\unit_types.tsv) か
 bool IsUnitType(const char* s);
 
