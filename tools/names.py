@@ -14,6 +14,9 @@
   python tools/names.py verify FILE        # 訳のファイル <種類>_NNN.out.tsv (key<TAB>日本語<TAB>メモ) を検査する
   python tools/names.py merge              # 訳のファイルを編集用の対訳表に入れ、公開する対訳表に書き戻す
   python tools/names.py rules              # 番号つきの日本の艦艇 (伊58、第5号駆潜艇など) を規則で訳す
+  python tools/names.py surnames [件数]    # 人物の姓 (訳していないもの) を work/names/batches/surnames_NNN.tsv に分ける
+  python tools/names.py surname-merge      # surnames_NNN.out.tsv の訳を translation/surnames.tsv に入れる
+  python tools/names.py persons            # 姓の訳から leaders / pilots の訳 (姓の訳 + 頭文字) を組み立てる
 """
 import glob
 import os
@@ -310,6 +313,137 @@ def merge_batches():
     do_import()
 
 
+# ---------------------------------------------------------------- 人物名 (姓だけ訳す)
+# 人物名は「姓, 頭文字」(例 Nagumo, C.) の形。姓ごとに訳し (translation/surnames.tsv)、
+# 「姓の訳 + 空白 + 頭文字」を組み立てて leaders / pilots の表に入れる。
+# 姓の表はゲームに配置しない (姓だけの訳が DLL の辞書に入ると、ほかの文の %s に効いてしまうため)。
+SURNAMES = os.path.join(sheet.ROOT, "translation", "surnames.tsv")
+PERSON_KINDS = ("leaders", "pilots")
+
+
+def split_person(e):
+    """人物名 -> (姓, 残り)。コンマがなければ最初の空白で分ける"""
+    e = e.strip()
+    if "," in e:
+        s, rest = e.split(",", 1)
+    elif " " in e:
+        s, rest = e.split(" ", 1)
+    else:
+        s, rest = e, ""
+    return s.strip(), rest.strip()
+
+
+def read_surnames():
+    d = {}
+    if os.path.exists(SURNAMES):
+        with open(SURNAMES, encoding="utf-8") as f:
+            for line in f:
+                line = line.rstrip("\r\n")
+                if line and not line.startswith("#"):
+                    col = (line.split("\t") + ["", ""])[:3]
+                    d[col[0]] = (col[1], col[2])
+    return d
+
+
+def write_surnames(d):
+    with open(SURNAMES, "w", encoding="utf-8", newline="\n") as f:
+        f.write("# 人物の姓の訳。key\\t日本語\\tメモ。key は姓 (英語) の FNV-1a 64bit。ゲームには配置しない (tools/names.py persons で人名を組み立てる)\n")
+        for k, (ja, memo) in sorted(d.items()):
+            if ja:
+                f.write("%s\t%s\t%s\n" % (k, ja, memo))
+
+
+def surname_batches(size):
+    """訳していない姓を work/names/batches/surnames_NNN.tsv (key, surname, count, examples) に分ける"""
+    done = read_surnames()
+    info = {}
+    for kind in PERSON_KINDS:
+        head, rows = read_work(kind)
+        ie = head.index("english")
+        for r in rows:
+            if not r[ie]:
+                continue
+            s, _ = split_person(r[ie])
+            if not s:
+                continue
+            k = sheet.key_of(s.encode("latin-1"))
+            if done.get(k, ("", ""))[0]:
+                continue
+            c, ex = info.get(s, (0, []))
+            if len(ex) < 3:
+                ex = ex + ["%s(%s)" % (r[ie], "指揮官" if kind == "leaders" else "パイロット")]
+            info[s] = (c + 1, ex)
+    todo = sorted(info, key=lambda x: x.lower())
+    os.makedirs(BATCHES, exist_ok=True)
+    n = 0
+    for i in range(0, len(todo), size):
+        n += 1
+        with open(os.path.join(BATCHES, "surnames_%03d.tsv" % n), "w", encoding="utf-8", newline="\n") as f:
+            f.write("key\tsurname\tcount\texamples\n")
+            for s in todo[i:i + size]:
+                c, ex = info[s]
+                f.write("%s\t%s\t%d\t%s\n" % (sheet.key_of(s.encode("latin-1")), s, c, " / ".join(ex)))
+    print("surnames: %d -> %d batches" % (len(todo), n))
+
+
+def surname_merge():
+    """work/names/batches/surnames_NNN.out.tsv (key<TAB>日本語<TAB>メモ) を translation/surnames.tsv に入れる"""
+    d = read_surnames()
+    n = 0
+    for p in sorted(glob.glob(os.path.join(BATCHES, "surnames_[0-9][0-9][0-9].out.tsv"))):
+        src = p.replace(".out.tsv", ".tsv")
+        keys = set()
+        with open(src, encoding="utf-8") as f:
+            next(f)
+            for line in f:
+                keys.add(line.split("\t")[0])
+        with open(p, encoding="utf-8-sig") as f:
+            for no, line in enumerate(f, 1):
+                col = (line.rstrip("\r\n").split("\t") + ["", ""])[:3]
+                k, ja, memo = col
+                if not k.startswith("h:") or not ja:
+                    continue
+                if k not in keys:
+                    print("%s %d行目: 知らないキー" % (os.path.basename(p), no))
+                    continue
+                try:
+                    b = ja.encode("cp932")
+                except UnicodeEncodeError:
+                    print("%s %d行目: CP932 にない文字 %r" % (os.path.basename(p), no, ja))
+                    continue
+                if len(b) > 19 or "~" in ja or "～" in ja or "%" in ja or re.search(r"[A-Za-z]", memo):
+                    print("%s %d行目: 長すぎる、~ % がある、またはメモに英字 %s %s" % (os.path.basename(p), no, ja, memo))
+                    continue
+                d[k] = (ja, memo)
+                n += 1
+    write_surnames(d)
+    print("surnames: merged %d, total %d" % (n, sum(1 for v in d.values() if v[0])))
+
+
+def compose_persons():
+    """姓の訳から leaders / pilots の訳を組み立てる (手で入れた訳は上書きしない。前回の組み立ては作り直す)"""
+    sur = read_surnames()
+    for kind in PERSON_KINDS:
+        head, rows = read_work(kind)
+        ie, ij, im = head.index("english"), head.index("ja"), head.index("memo")
+        n = 0
+        for r in rows:
+            if not r[ie] or (r[ij] and r[im] != "姓から"):
+                continue
+            s, rest = split_person(r[ie])
+            ja = sur.get(sheet.key_of(s.encode("latin-1")), ("", ""))[0]
+            if not ja:
+                continue
+            full = ja + (" " + rest if rest else "")
+            if len(full.encode("cp932")) > 19:
+                full = ja
+            r[ij], r[im] = full, "姓から"
+            n += 1
+        write_work(kind, head, rows)
+        print("%s: %d names from surnames" % (kind, n))
+    do_import()
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 日本語を含む結果の表示で止まらないように
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -332,6 +466,12 @@ def main():
         merge_batches()
     elif cmd == "rules":
         apply_rules()
+    elif cmd == "surnames":
+        surname_batches(int(sys.argv[2]) if len(sys.argv) > 2 else 600)
+    elif cmd == "surname-merge":
+        surname_merge()
+    elif cmd == "persons":
+        compose_persons()
     else:
         print(__doc__)
 
