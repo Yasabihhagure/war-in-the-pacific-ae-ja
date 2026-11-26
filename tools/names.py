@@ -157,22 +157,63 @@ SHIP_RULES = [
 ]
 
 
+_ORD = r"(\d+)(?:st|nd|rd|th)?"
+# 航空隊・地上部隊の決まった形。訳の書式の {0} {1} は正規表現の組 (数字は先頭の 0 を落とす)
+UNIT_RULES = {
+    "air_groups": [
+        (_ORD + r" Sentai", "飛行第{0}戦隊"),
+        (_ORD + r" Ku ([A-Z]-\d+)", "{0}空 {1}"),
+        (_ORD + r" Ku", "{0}空"),
+        (_ORD + r" Shinbu-tai", "第{0}振武隊"),
+        (_ORD + r" Fighter Group", "第{0}戦闘機群"),
+        (_ORD + r" Bomber Group", "第{0}爆撃群"),
+        (_ORD + r" Troop Carrier Group", "第{0}輸送機群"),
+        (_ORD + r" Photo Group", "第{0}写真偵察群"),
+        (_ORD + r" Night Fighter Group", "第{0}夜戦群"),
+    ],
+    "ground_units": [
+        (_ORD + r" (?:Division|Div)", "第{0}師団"),
+        (_ORD + r" Ind\.? ?Mixed", "独立混成第{0}旅団"),
+        (_ORD + r" Garrison(?: Unit)?", "第{0}守備隊"),
+    ],
+}
+# 英語のまま残す形 (略記や見出し)。バッチに入れない
+KEEP_RE = {
+    "air_groups": re.compile(
+        _ORD + r" [A-Z]{2,5}/" + _ORD + r" [A-Z]{2,5}( [A-Z]{2,4})?"   # 93rd BG/329th BS
+        r"|\d?/?V[A-Z]{1,4}-\d+[A-Z]?(/\d)?"                          # VF-3, 1/VCS-13
+        r"|\d+ [A-Za-z]+-?[A-Za-z]*/\d+ [A-Za-z]+"                    # 316 ShAD/336 ShAP
+        r"|[A-Z0-9 ./*-]+"),                                          # 見出し
+    "ground_units": re.compile(r"[A-Z0-9 ./*-]+"),
+}
+
+
+def _num(s):
+    return str(int(s)) if s.isdigit() else s
+
+
 def apply_rules():
-    """SHIP_RULES に合う艦船の名前に訳を入れる (訳が空のものだけ)"""
-    head, rows = read_work("ships")
-    ie, ij = head.index("english"), head.index("ja")
-    n = 0
-    for r in rows:
-        if r[ij]:
-            continue
-        for pat, fmt in SHIP_RULES:
-            m = re.fullmatch(pat, r[ie])
-            if m:
-                r[ij] = fmt.format(int(m.group(1)))
-                n += 1
-                break
-    write_work("ships", head, rows)
-    print("ships: %d names by rules" % n)
+    """SHIP_RULES / UNIT_RULES に合う名前に訳を入れる (訳が空のものだけ)"""
+    rules = {"ships": [(p, f.replace("{}", "{0}")) for p, f in SHIP_RULES]}
+    rules.update(UNIT_RULES)
+    for kind, rl in rules.items():
+        head, rows = read_work(kind)
+        ie, ij = head.index("english"), head.index("ja")
+        n = 0
+        for r in rows:
+            if r[ij]:
+                continue
+            e = r[ie].strip()
+            for pat, fmt in rl:
+                m = re.fullmatch(pat, e)
+                if m:
+                    ja = fmt.format(*[_num(g) for g in m.groups()])
+                    if len(ja.encode("cp932")) <= 19:
+                        r[ij] = ja
+                        n += 1
+                    break
+        write_work(kind, head, rows)
+        print("%s: %d names by rules" % (kind, n))
     do_import()
 
 
