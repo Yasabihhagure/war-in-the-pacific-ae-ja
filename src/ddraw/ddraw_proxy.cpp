@@ -85,10 +85,11 @@ static std::string Utf8ToCp932(const std::string& u) {
 
 // ja.tsv: キー \t 訳文 \t メモ  (UTF-8, '#' 始まりはコメント)
 // キーは "h:" + 英文の FNV-1a 64bit を16桁の16進で書いたもの
-static void LoadDict() {
-    std::string path = std::string(g_dir) + "witpae_ja\\ja.tsv";
+// 1つの対訳ファイルを読む。名前の対訳 (names\*.tsv) は、画面の文言 (ja.tsv) より後に読み、
+// 同じキーがあれば画面の文言のほうを優先する (prefer=false)
+static int LoadDictFile(const std::string& path, bool prefer) {
     FILE* f = nullptr;
-    if (fopen_s(&f, path.c_str(), "rb") != 0 || !f) { LogLine("[dict] not found: %s", path.c_str()); return; }
+    if (fopen_s(&f, path.c_str(), "rb") != 0 || !f) return -1;
     char buf[8192];
     int n = 0;
     bool first = true;
@@ -101,11 +102,29 @@ static void LoadDict() {
         size_t p = 0;
         while (true) { size_t q = line.find('\t', p); col.push_back(line.substr(p, q == std::string::npos ? std::string::npos : q - p)); if (q == std::string::npos) break; p = q + 1; }
         if (col.size() < 2 || col[1].empty() || col[0].size() != 18 || col[0].compare(0, 2, "h:") != 0) continue;
-        g_dict[strtoull(col[0].c_str() + 2, nullptr, 16)] = Utf8ToCp932(Unescape(col[1]));
+        unsigned long long k = strtoull(col[0].c_str() + 2, nullptr, 16);
+        if (!prefer && g_dict.count(k)) continue;
+        g_dict[k] = Utf8ToCp932(Unescape(col[1]));
         n++;
     }
     fclose(f);
-    LogLine("[dict] loaded %d entries", n);
+    return n;
+}
+
+static void LoadDict() {
+    std::string dir = std::string(g_dir) + "witpae_ja\\";
+    int n = LoadDictFile(dir + "ja.tsv", true);
+    LogLine("[dict] ja.tsv: %d entries", n);
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA((dir + "names\\*.tsv").c_str(), &fd);
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            int m = LoadDictFile(dir + "names\\" + fd.cFileName, false);
+            LogLine("[dict] names\\%s: %d entries", fd.cFileName, m);
+        } while (FindNextFileA(h, &fd));
+        FindClose(h);
+    }
+    LogLine("[dict] total %u entries", (unsigned)g_dict.size());
 }
 
 static void LoadIni() {
