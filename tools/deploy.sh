@@ -9,5 +9,7 @@ mkdir -p "$G/witpae_ja/names"
 cp "$W/translation/ja.tsv" "$G/witpae_ja/ja.tsv"
 rm -f "$G/witpae_ja/strings.tsv"
 if ls "$W/translation/names/"*.tsv >/dev/null 2>&1; then cp "$W/translation/names/"*.tsv "$G/witpae_ja/names/"; fi
-python "$W/tools/scen.py" build "$G/witpae_ja/SCEN"
+# シナリオ説明の訳。書き出し先は既定（ゲームの witpae_ja\SCEN）に任せる。
+# Python に /d/... の形のパスを渡すと D:\d\... に書かれてしまうので渡さない。
+python "$W/tools/scen.py" build
 echo "deployed to $G"
