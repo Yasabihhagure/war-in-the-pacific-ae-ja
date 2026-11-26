@@ -222,7 +222,11 @@ const DWORD A_WRAP = 0x7ed780;
 
 std::unordered_map<unsigned long long, int> g_charWidth; // (フォント, 文字) -> 幅
 
-int AsciiAdvance(void* font, BYTE c) { return *(int*)((BYTE*)font + 0x824 + 28 * c); }
+// 文字画像の表は1文字 56 バイト (0x7fa9c8: c*7*8)。等幅のときは +4 の幅 ([0xfe8aeea] != 0)
+int AsciiAdvance(void* font, BYTE c) {
+    if (*(BYTE*)0xfe8aeea) return ((int*)font)[1];
+    return *(int*)((BYTE*)font + 0x824 + 56 * c);
+}
 
 int SjisCharWidth(void* font, const char* p) {
     unsigned long long key = ((unsigned long long)(uintptr_t)font << 16) | ((BYTE)p[0] << 8) | (BYTE)p[1];
@@ -252,6 +256,13 @@ bool NoLineEnd(const char* p, bool dbcs) {
 
 int __cdecl h_Wrap(const char* s, const char** starts, int* lens, int maxLines, int len, int maxWidth, const char* brk) {
     void* font = *P_CURFONT;
+    if (s && len > 0 && (maxWidth <= 0 || brk || !font)) {
+        static int logged0 = 0;
+        if (logged0 < 30 && HasHigh(s, (int)strnlen(s, (size_t)len))) {
+            logged0++;
+            LogLine("[wrap] original caller=%p max=%d len=%d brk=%p", __builtin_return_address(0), maxWidth, len, brk);
+        }
+    }
     if (!s || len <= 0 || maxWidth <= 0 || brk || !font) return o_Wrap(s, starts, lens, maxLines, len, maxWidth, brk);
     int n = (int)strnlen(s, (size_t)len);
     if (!HasHigh(s, n)) return o_Wrap(s, starts, lens, maxLines, len, maxWidth, brk);
@@ -288,6 +299,14 @@ int __cdecl h_Wrap(const char* s, const char** starts, int* lens, int maxLines, 
         starts[count] = s + lineStart;
         lens[count] = end - lineStart + 1;
         count++;
+    }
+    static int logged = 0;
+    if (count > 1 && logged < 40) {
+        logged++;
+        std::string out;
+        for (int k = 0; k < count; k++) { out += '|'; out.append(starts[k], lens[k]); }
+        LogLine("[wrap] caller=%p max=%d len=%d font=%p fh=%d lines=%d %s", __builtin_return_address(0), maxWidth, len,
+                font, FontHeight(font), count, out.c_str());
     }
     return count;
 }
