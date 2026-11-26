@@ -28,6 +28,8 @@ bool  g_active = false;    // 拡大中
 int   g_fw = 0, g_fh = 0;  // 窓の枠の太さ (外側 - 中身)
 RECT  g_area = {};         // 窓を置く範囲 (作業領域、枠なしならモニター全体)
 bool  g_inFit = false;
+int   g_bltCount = 0;    // 主サーフェスへの Blt の回数
+void* g_backSurf = nullptr; // 主サーフェスへ全体を転送するときの転送元 (裏の画像)
 HWND  g_hwnd = nullptr;
 WNDPROC g_origProc = nullptr;
 void* g_primary = nullptr;
@@ -72,6 +74,38 @@ bool HasWindowedSwitch() {
     return false;
 }
 
+typedef HRESULT (WINAPI *GetDC_t)(void*, HDC*);
+typedef HRESULT (WINAPI *ReleaseDC_t)(void*, HDC);
+
+// 拡大した画像の外側 (余白) を黒で塗る
+void PaintMargins(HDC dc) {
+    RECT rc; GetClientRect(g_hwnd, &rc);
+    int r = ToWinX(g_gw), b = ToWinY(g_gh);
+    HBRUSH k = (HBRUSH)GetStockObject(BLACK_BRUSH);
+    RECT m;
+    if (g_offX > 0) { SetRect(&m, 0, 0, g_offX, rc.bottom); FillRect(dc, &m, k); }
+    if (r < rc.right) { SetRect(&m, r, 0, rc.right, rc.bottom); FillRect(dc, &m, k); }
+    if (g_offY > 0) { SetRect(&m, 0, 0, rc.right, g_offY); FillRect(dc, &m, k); }
+    if (b < rc.bottom) { SetRect(&m, 0, b, rc.right, rc.bottom); FillRect(dc, &m, k); }
+}
+
+// 裏の画像の rect (ゲームの座標) を、窓の DC へ拡大して描く
+bool StretchFrom(void* src, HDC wdc, const RECT& r) {
+    if (!src) return false;
+    void** svt = *(void***)src;
+    HDC sdc = nullptr;
+    if (((GetDC_t)svt[17])(src, &sdc) != 0 || !sdc) return false;
+    RECT d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
+    SetStretchBltMode(wdc, g_smooth ? HALFTONE : COLORONCOLOR);
+    SetBrushOrgEx(wdc, 0, 0, nullptr);
+    StretchBlt(wdc, d.left, d.top, d.right - d.left, d.bottom - d.top,
+               sdc, r.left, r.top, r.right - r.left, r.bottom - r.top, SRCCOPY);
+    ((ReleaseDC_t)svt[26])(src, sdc);
+    return true;
+}
+
+void FitWindow();
+
 // ---------------------------------------------------------------- 窓のメッセージ
 LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     if (g_active && h == g_hwnd) {
@@ -95,9 +129,24 @@ LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
         } else if (msg == WM_SIZE) {
             Recalc();
         } else if (msg == WM_ERASEBKGND) {
-            RECT rc; GetClientRect(h, &rc);
-            FillRect((HDC)wp, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+            // 窓全体を塗ると、ゲームが一部だけ描き直すときに残りが黒くなる。余白だけ塗る
+            PaintMargins((HDC)wp);
             return 1;
+        } else if (msg == WM_PAINT) {
+            // 再描画はゲームに任せる (ゲームは主サーフェスへ Blt し、h_Blt で拡大される)。
+            // ゲームが Blt しなかったときだけ、裏の画像の全体を拡大して描く
+            if (GameSize()) FitWindow();
+            int before = g_bltCount;
+            LRESULT r = CallWindowProcA(g_origProc, h, msg, wp, lp);
+            if (g_bltCount == before) {
+                void* src = g_backSurf ? g_backSurf : *(void**)0xfe7369c;
+                HDC dc = GetDC(h);
+                RECT all = { 0, 0, g_gw, g_gh };
+                StretchFrom(src, dc, all);
+                ReleaseDC(h, dc);
+                ValidateRect(h, nullptr);
+            }
+            return r;
         }
     }
     return CallWindowProcA(g_origProc, h, msg, wp, lp);
@@ -182,8 +231,6 @@ HWND WINAPI h_CreateWindowExA(DWORD ex, LPCSTR cls, LPCSTR title, DWORD style, i
 typedef HRESULT (WINAPI *CreateSurface_t)(void*, void* desc, void** out, void*);
 typedef HRESULT (WINAPI *Blt_t)(void*, RECT*, void*, RECT*, DWORD, void*);
 typedef HRESULT (WINAPI *BltFast_t)(void*, DWORD, DWORD, void*, RECT*, DWORD);
-typedef HRESULT (WINAPI *GetDC_t)(void*, HDC*);
-typedef HRESULT (WINAPI *ReleaseDC_t)(void*, HDC);
 CreateSurface_t o_CreateSurface;
 Blt_t o_Blt;
 BltFast_t o_BltFast;
@@ -200,25 +247,22 @@ void PatchSlot(void** vt, int idx, void* hook, void** orig) {
 HRESULT WINAPI h_Blt(void* self, RECT* dst, void* src, RECT* srcRect, DWORD flags, void* fx) {
     if (!g_active || self != g_primary || !src || !g_hwnd)
         return o_Blt(self, dst, src, srcRect, flags, fx);
+    g_bltCount++;
     if (GameSize()) FitWindow();
     RECT r = srcRect ? *srcRect : RECT{ 0, 0, g_gw, g_gh };
     RECT d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
     static int logged = 0;
     if (logged < 5 || (logged < 50 && (r.right - r.left) != g_gw)) { logged++; LogLine("[display] Blt src=%ld,%ld-%ld,%ld flags=%lX", r.left, r.top, r.right, r.bottom, flags); }
-    if (g_smooth) {
-        void** svt = *(void***)src;
-        HDC sdc = nullptr;
-        if (((GetDC_t)svt[17])(src, &sdc) == 0 && sdc) {
-            HDC wdc = GetDC(g_hwnd);
-            SetStretchBltMode(wdc, HALFTONE);
-            SetBrushOrgEx(wdc, 0, 0, nullptr);
-            StretchBlt(wdc, d.left, d.top, d.right - d.left, d.bottom - d.top,
-                       sdc, r.left, r.top, r.right - r.left, r.bottom - r.top, SRCCOPY);
-            ReleaseDC(g_hwnd, wdc);
-            ((ReleaseDC_t)svt[26])(src, sdc);
-            return 0;
-        }
+    if (r.right > g_gw) r.right = g_gw;
+    if (r.bottom > g_gh) r.bottom = g_gh;
+    if (r.left == 0 && r.top == 0 && r.right == g_gw && r.bottom == g_gh) g_backSurf = src;
+    {
+        HDC wdc = GetDC(g_hwnd);
+        bool ok = StretchFrom(src, wdc, r);
+        ReleaseDC(g_hwnd, wdc);
+        if (ok) return 0;
     }
+    d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
     POINT o = { 0, 0 }; ClientToScreen(g_hwnd, &o);
     OffsetRect(&d, o.x, o.y);
     return o_Blt(self, &d, src, &r, flags, fx);
