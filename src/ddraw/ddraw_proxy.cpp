@@ -261,6 +261,22 @@ static void LoadReal() {
     __asm__ __volatile__("jmp *%0" :: "m"(p_##name)); }
 DDLIST(DDSTUB)
 
+// ---------------------------------------------------------------- 表示スケール対策
+// Windows の表示スケール(125%/150%など)でゲーム画面が拡大されて切れるのを防ぐ。
+// 窓やウィンドウを作る前(=DllMain)に、プロセスを DPI 対応として登録する。
+static void SetDpiAware() {
+    HMODULE u = GetModuleHandleA("user32.dll");
+    typedef BOOL (WINAPI *Ctx_t)(HANDLE);
+    typedef BOOL (WINAPI *Old_t)();
+    if (auto f = (Ctx_t)GetProcAddress(u, "SetProcessDpiAwarenessContext")) {
+        BOOL ok = f((HANDLE)-4 /* PER_MONITOR_AWARE_V2 */) || f((HANDLE)-2 /* SYSTEM_AWARE */);
+        LogLine("[dpi] SetProcessDpiAwarenessContext %s (err=%lu)", ok ? "ok" : "FAILED", ok ? 0 : GetLastError());
+        if (ok) return;
+    }
+    if (auto f = (Old_t)GetProcAddress(u, "SetProcessDPIAware"))
+        LogLine("[dpi] SetProcessDPIAware %s", f() ? "ok" : "FAILED");
+}
+
 // ---------------------------------------------------------------- DllMain
 BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
     if (reason == DLL_PROCESS_ATTACH) {
@@ -272,6 +288,8 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
         std::string logPath = std::string(g_dir) + "witpae_ja_log.txt";
         g_log = _fsopen(logPath.c_str(), "w", _SH_DENYNO); // ゲーム実行中も読めるように共有で開く
         LogLine("[start] WITPAE ja proxy. ACP=%u", GetACP());
+        if (GetPrivateProfileIntA("Display", "DpiAware", 1, (std::string(g_dir) + "witpae_ja.ini").c_str()))
+            SetDpiAware();
         LoadReal();
         LoadDict();
         InstallHooks();
