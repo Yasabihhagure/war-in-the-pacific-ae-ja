@@ -435,7 +435,8 @@ def compose_persons():
             if not ja:
                 continue
             full = ja + (" " + rest if rest else "")
-            if len(full.encode("cp932")) > 19:
+            # 名が綴りで書かれている (Abe, Heisuke など) なら、ローマ字と混ぜずに姓だけにする
+            if re.search(r"[a-z]{2,}", rest) or len(full.encode("cp932")) > 19:
                 full = ja
             r[ij], r[im] = full, "姓から"
             n += 1
