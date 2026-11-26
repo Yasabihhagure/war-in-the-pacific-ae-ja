@@ -13,6 +13,7 @@
   python tools/names.py batch 種類 [件数]  # 訳していない名前を work/names/batches/<種類>_NNN.tsv に分ける (既定 400)
   python tools/names.py verify FILE        # 訳のファイル <種類>_NNN.out.tsv (key<TAB>日本語<TAB>メモ) を検査する
   python tools/names.py merge              # 訳のファイルを編集用の対訳表に入れ、公開する対訳表に書き戻す
+  python tools/names.py rules              # 番号つきの日本の艦艇 (伊58、第5号駆潜艇など) を規則で訳す
 """
 import glob
 import os
@@ -142,6 +143,38 @@ def do_import():
 
 BATCHES = os.path.join(WORK, "batches")
 
+# 番号つきの日本の艦艇を規則で訳す (艦船の名前)。(正規表現, 訳の書式)
+SHIP_RULES = [
+    (r"I-(\d+)", "伊{}"),               # 伊号潜水艦
+    (r"RO-(\d+)", "呂{}"),              # 呂号潜水艦
+    (r"Ha-(\d+)", "波{}"),              # 波号潜水艦
+    (r"Ch (\d+)", "第{}号駆潜艇"),
+    (r"CHa-(\d+)", "第{}号駆潜特務艇"),
+    (r"W-(\d+)", "第{}号掃海艇"),
+    (r"Wa (\d+)", "第{}号掃海特務艇"),
+    (r"T-(\d+)", "第{}号輸送艦"),
+    (r"Yu-(\d+)", "ゆ{}"),              # 陸軍の潜航輸送艇
+]
+
+
+def apply_rules():
+    """SHIP_RULES に合う艦船の名前に訳を入れる (訳が空のものだけ)"""
+    head, rows = read_work("ships")
+    ie, ij = head.index("english"), head.index("ja")
+    n = 0
+    for r in rows:
+        if r[ij]:
+            continue
+        for pat, fmt in SHIP_RULES:
+            m = re.fullmatch(pat, r[ie])
+            if m:
+                r[ij] = fmt.format(int(m.group(1)))
+                n += 1
+                break
+    write_work("ships", head, rows)
+    print("ships: %d names by rules" % n)
+    do_import()
+
 
 def read_work(kind):
     """編集用の対訳表 -> (見出し, 行のリスト)"""
@@ -252,6 +285,8 @@ def main():
         sys.exit(1 if probs else 0)
     elif cmd == "merge":
         merge_batches()
+    elif cmd == "rules":
+        apply_rules()
     else:
         print(__doc__)
 
