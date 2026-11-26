@@ -14,7 +14,7 @@ work/sheet.tsv の列: key, english, ja, memo, kind, source
   ja と memo だけを編集する。english などは編集しても取り込まれない。
   kind: seen=ゲーム中に表示された / text=文らしい / id=末尾に %番号@ がつく文 (番号を外した文で訳す)
         name=末尾に %番号@ がつく人名 (訳さない)
-        code=内部の名前 / file=ファイル名 / ctrl=制御文字・1文字
+        code=内部の名前 / file=ファイル名 / junk=コードから参照されていない (ゴミ) / ctrl=制御文字・1文字
   source: F=書式のログ, L=描いた行のログ, T/E/D/M=旧形式のログ, exe=exe の文字列
 """
 import glob
@@ -143,7 +143,16 @@ CODE_RE = re.compile(rb"^[A-Za-z_][A-Za-z0-9_]*$")
 ID_RE = re.compile(rb"%\d+@$")
 
 
-def classify(b, tags):
+def load_refs():
+    """tools/refs.py の結果 (work/refs.tsv) から、参照されている文字列のキーを読む"""
+    path = os.path.join(os.path.dirname(SHEET), "refs.tsv")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        return {line.split("	", 1)[0] for line in f}
+
+
+def classify(b, tags, referenced=True):
     if any(c < 0x20 and c not in (9, 10, 13) for c in b) or len(b.strip()) <= 1:
         return "ctrl"
     if FILE_RE.search(b):
@@ -156,6 +165,8 @@ def classify(b, tags):
         return "seen"
     if CODE_RE.match(b) and (re.search(rb"[a-z][A-Z]", b) or b"_" in b):
         return "code"
+    if not referenced:
+        return "junk"
     return "text"
 
 
@@ -173,7 +184,7 @@ def collect():
     print("collected: %s" % dst)
 
 
-ORDER = {"seen": 0, "text": 1, "id": 2, "name": 3, "code": 4, "file": 5, "ctrl": 6}
+ORDER = {"seen": 0, "text": 1, "id": 2, "name": 3, "code": 4, "file": 5, "junk": 6, "ctrl": 7}
 
 
 def export():
@@ -183,9 +194,12 @@ def export():
         rows.setdefault(key_of(b), [b, set()])[1].add(tag)
     for b in exe_strings():
         rows.setdefault(key_of(b), [b, set()])[1].add("exe")
+    refs = load_refs()
+    if refs is None:
+        print("note: work/refs.tsv がないので、参照の有無で分けていない (python tools/refs.py で作る)")
     items = []
     for k, (b, tags) in rows.items():
-        items.append((classify(b, tags), k, b, tags))
+        items.append((classify(b, tags, refs is None or k in refs), k, b, tags))
     items.sort(key=lambda x: (ORDER[x[0]], x[2].lower()))
     missing = [k for k in ja if k not in rows]
     counts = {}

@@ -15,8 +15,8 @@ namespace {
 // ---------------------------------------------------------------- exe のアドレス
 const DWORD A_DRAWLINE = 0x7fa920; // void (int x, int y, const char* s, IDirectDrawSurface7* target, int color)
 const DWORD A_WIDTH    = 0x7f43e0; // int  (const char* s, Font* font)
-const DWORD A_VFMT     = 0x7f2b70; // int  (char* buf, const char* fmt, va_list va)
 const DWORD A_VSNPRINT = 0x7f13c0; // int  (int size, char* buf, const char* fmt, va_list va)
+const DWORD A_SPRINTF  = 0x80f1ab; // int  (char* buf, const char* fmt, ...)  C 標準ライブラリ
 
 void** const P_CURFONT = (void**)0xfe73458;  // 現在のフォント
 void** const P_SCREEN  = (void**)0xfe7369c;  // 既定の描画先サーフェス
@@ -154,7 +154,6 @@ int LowRunLen(const char* s) {
 // ---------------------------------------------------------------- フック本体
 typedef void (__cdecl *DrawLine_t)(int, int, const char*, void*, int);
 typedef int  (__cdecl *Width_t)(const char*, void*);
-typedef int  (__cdecl *VSnprint_t)(int, char*, const char*, va_list);
 
 DrawLine_t o_DrawLine;
 Width_t    o_Width;
@@ -204,16 +203,48 @@ int __cdecl h_Width(const char* s, void* font) {
     return w;
 }
 
-// 書式を訳文の書式に差し替えてから組み立てる
-int __cdecl h_Vfmt(char* buf, const char* fmt, va_list va) {
-    if (fmt) {
-        int n = (int)strlen(fmt);
-        Seen("F", fmt, n);
-        if (const std::string* t = Lookup(fmt, n)) fmt = t->c_str();
-    }
-    return ((VSnprint_t)A_VSNPRINT)(0x200, buf, fmt, va);
+} // namespace
+
+// ---------------------------------------------------------------- 書式の差し替え
+// 引数の数が決まっていない関数 (sprintf など) は、スタック上の書式の引数だけを訳文に
+// 差し替えてから、元の関数 (の先頭を写した入口) へ飛ぶ。
+//   0x7f13c0 (size, buf, fmt, va)  ゲーム側の書式組み立ての共通の入口 (sprintf/vsprintf 相当、
+//                                   ツールチップの登録 0x40d180 もここを通る)
+//   0x80f1ab (buf, fmt, ...)       C 標準ライブラリの sprintf (静的リンク、1479 か所から呼ばれる)
+extern "C" {
+void* t_Vsn = nullptr;
+void* t_Sprintf = nullptr;
+
+const char* __cdecl TranslateFmt(const char* fmt) {
+    if (!fmt) return fmt;
+    int n = (int)strlen(fmt);
+    Seen("F", fmt, n);
+    if (const std::string* t = Lookup(fmt, n)) return t->c_str();
+    return fmt;
 }
 
+// 入口では [esp]=戻り先、[esp+4]=size、[esp+8]=buf、[esp+12]=fmt
+__attribute__((naked, used)) void s_Vsn() {
+    __asm__ __volatile__(
+        "pushl 12(%esp)\n\t"
+        "call _TranslateFmt\n\t"
+        "addl $4, %esp\n\t"
+        "movl %eax, 12(%esp)\n\t"
+        "jmp *_t_Vsn\n\t");
+}
+
+// 入口では [esp]=戻り先、[esp+4]=buf、[esp+8]=fmt
+__attribute__((naked, used)) void s_Sprintf() {
+    __asm__ __volatile__(
+        "pushl 8(%esp)\n\t"
+        "call _TranslateFmt\n\t"
+        "addl $4, %esp\n\t"
+        "movl %eax, 8(%esp)\n\t"
+        "jmp *_t_Sprintf\n\t");
+}
+}
+
+namespace {
 } // namespace
 
 void InstallGameHooks() {
@@ -225,7 +256,8 @@ void InstallGameHooks() {
         // name       addr        先頭の機械語 (版の確認)         写す長さ  フック            元の関数への入口
         {"DrawLine", A_DRAWLINE, "83ec18833d4484391000",            10, (void*)h_DrawLine, (void**)&o_DrawLine},
         {"Width",    A_WIDTH,    "558b6c2408",                      5,  (void*)h_Width,    (void**)&o_Width},
-        {"Vfmt",     A_VFMT,     "8b44240c8b4c24088b542404",        0,  (void*)h_Vfmt,     nullptr},
+        {"Vsnprintf", A_VSNPRINT, "81ec1c0f0000",                   6,  (void*)s_Vsn,      &t_Vsn},
+        {"sprintf",  A_SPRINTF,  "558bec83ec20",                    6,  (void*)s_Sprintf,  &t_Sprintf},
     };
     for (auto& it : items) {
         if (!CheckBytes(it.addr, it.bytes)) { LogLine("[game] %s: bytes mismatch, skipped (different exe version?)", it.name); continue; }
