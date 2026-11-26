@@ -22,3 +22,6 @@ void DisplayOnDirectDraw(void* dd);
 void* DisplayHookRegisterClassA(void* orig);
 void* DisplayHookCreateWindowExA(void* orig);
 void* DisplayPrimarySurface();
+
+// scaler.cpp: 裏の画像を読み出して自前で拡大し、窓へ描く
+bool ScalePresent(void* surf, HDC wdc, int dx, int dy, int dw, int dh, bool smooth);

@@ -89,18 +89,40 @@ void PaintMargins(HDC dc) {
     if (b < rc.bottom) { SetRect(&m, 0, b, rc.right, rc.bottom); FillRect(dc, &m, k); }
 }
 
+// 処理時間の計測 (2秒ごとにログへ)
+LARGE_INTEGER g_qpf, g_statStart;
+int g_statN = 0; double g_statMs = 0, g_statMax = 0, g_statGetDC = 0;
+double NowMs() { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart * 1000.0 / g_qpf.QuadPart; }
+void Stat(double ms, double getdcMs) {
+    if (!g_qpf.QuadPart) { QueryPerformanceFrequency(&g_qpf); QueryPerformanceCounter(&g_statStart); }
+    g_statN++; g_statMs += ms; g_statGetDC += getdcMs; if (ms > g_statMax) g_statMax = ms;
+    double el = NowMs() - g_statStart.QuadPart * 1000.0 / g_qpf.QuadPart;
+    if (el >= 2000) {
+        LogLine("[perf] %d presents in %.0f ms: avg %.1f ms (GetDC %.1f), max %.1f ms",
+                g_statN, el, g_statMs / g_statN, g_statGetDC / g_statN, g_statMax);
+        g_statN = 0; g_statMs = 0; g_statMax = 0; g_statGetDC = 0;
+        QueryPerformanceCounter(&g_statStart);
+    }
+}
+
 // 裏の画像の rect (ゲームの座標) を、窓の DC へ拡大して描く
 bool StretchFrom(void* src, HDC wdc, const RECT& r) {
+    // r は使わず、常に全体を描く (ゲームは全体を転送している)
+    (void)r;
     if (!src) return false;
-    void** svt = *(void***)src;
-    HDC sdc = nullptr;
-    if (((GetDC_t)svt[17])(src, &sdc) != 0 || !sdc) return false;
-    RECT d = { ToWinX(r.left), ToWinY(r.top), ToWinX(r.right), ToWinY(r.bottom) };
-    SetStretchBltMode(wdc, g_smooth ? HALFTONE : COLORONCOLOR);
-    SetBrushOrgEx(wdc, 0, 0, nullptr);
-    StretchBlt(wdc, d.left, d.top, d.right - d.left, d.bottom - d.top,
-               sdc, r.left, r.top, r.right - r.left, r.bottom - r.top, SRCCOPY);
-    ((ReleaseDC_t)svt[26])(src, sdc);
+    if (!g_qpf.QuadPart) { QueryPerformanceFrequency(&g_qpf); QueryPerformanceCounter(&g_statStart); }
+    double t0 = NowMs();
+    int dw = ToWinX(g_gw) - g_offX, dh = ToWinY(g_gh) - g_offY;
+    if (!ScalePresent(src, wdc, g_offX, g_offY, dw, dh, g_smooth)) {
+        // 読み出しに失敗したときは GDI で拡大する (遅い)
+        void** svt = *(void***)src;
+        HDC sdc = nullptr;
+        if (((GetDC_t)svt[17])(src, &sdc) != 0 || !sdc) return false;
+        SetStretchBltMode(wdc, COLORONCOLOR);
+        StretchBlt(wdc, g_offX, g_offY, dw, dh, sdc, 0, 0, g_gw, g_gh, SRCCOPY);
+        ((ReleaseDC_t)svt[26])(src, sdc);
+    }
+    Stat(NowMs() - t0, 0);
     return true;
 }
 
