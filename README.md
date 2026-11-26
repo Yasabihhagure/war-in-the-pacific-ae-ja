@@ -1,5 +1,7 @@
 # War in the Pacific: Admiral's Edition 日本語化（非公式）
 
+English version: [README.en.md](README.en.md)
+
 Matrix Games の『War in the Pacific: Admiral's Edition』を日本語で遊ぶための、非公式のファンメイド日本語化です。
 
 **ダウンロード: [最新版（Releases）](https://github.com/Yasabihhagure/war-in-the-pacific-ae-ja/releases/latest)**（`witpae-ja-版.zip`）
