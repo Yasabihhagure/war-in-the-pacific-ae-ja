@@ -47,8 +47,9 @@ An unofficial, fan-made Japanese localization for Matrix Games'
    The proxy DLL may be falsely flagged by security software;
    please check the hash before deciding to allow it.
 3. Extract the zip into the game folder (where the exe is).
-   This places `ddraw.dll`, `witpae_ja.ini`, and the `witpae_ja\`
-   folder (translations).
+   This places `ddraw.dll`, `witpae_ja.ini`, `witpae_ja_README.txt`
+   (a short bilingual note), and the `witpae_ja\` folder (translations
+   and this README).
 4. Launch the game as usual. Windowed mode is recommended (see below).
 
 ### Recommended: windowed mode
@@ -84,7 +85,8 @@ $s.Save()
 
 ## Uninstall
 
-Delete `ddraw.dll`, `witpae_ja.ini`, `witpae_ja_log.txt`, and the
+Delete `ddraw.dll`, `witpae_ja.ini`, `witpae_ja_log.txt`,
+`witpae_ja_README.txt`, and the
 `witpae_ja\` folder from the game folder (and the windowed-mode
 shortcut, if you created one).
 

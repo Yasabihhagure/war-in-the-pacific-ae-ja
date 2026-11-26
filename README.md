@@ -40,7 +40,8 @@ Matrix Games の『[War in the Pacific: Admiral's Edition](https://www.matrixgam
 3. zip を、ゲームのフォルダ（`War in the Pacific Admiral Edition.exe` があるフォルダ）に展開する。次のものが置かれます。
    - `ddraw.dll`（差し替え DLL）
    - `witpae_ja.ini`（設定）
-   - `witpae_ja\`（訳文）
+   - `witpae_ja\`（訳文と、この説明書き）
+   - `witpae_ja_README.txt`（英日の短い案内）
 4. いつもどおりゲームを起動する。
 
 `ddraw.dll` は、ゲームの動作を差し替える DLL なので、セキュリティソフトに誤って検出されることがあります。検出されたときは、上の SHA-256 で配布物が本物であることを確かめてから、許可するか判断してください。
@@ -77,6 +78,7 @@ $s.Save()
 - `ddraw.dll`
 - `witpae_ja.ini`
 - `witpae_ja_log.txt`
+- `witpae_ja_README.txt`
 - `witpae_ja\` フォルダ
 - 作った場合は、ウィンドウモードのショートカット（`WITPAE Windowed.lnk` など）
 
