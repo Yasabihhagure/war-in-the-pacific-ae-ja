@@ -131,8 +131,27 @@ void Seen(const char* tag, const char* s, int n) {
 const std::string* Lookup(const char* s, int n) {
     if (!g_translate || !s || n <= 0) return nullptr;
     if (g_dict.empty()) return nullptr;
-    auto it = g_dict.find(Fnv1a64(s, n));
-    return it == g_dict.end() ? nullptr : &it->second;
+    unsigned long long h = Fnv1a64(s, n);
+    auto it = g_dict.find(h);
+    if (it != g_dict.end()) return &it->second;
+    // 末尾の "%番号@" (ツールチップなどの番号) を外して探し、見つかれば番号を付け直す。
+    // 例: "Exit%2873@" → "Exit" の訳 + "%2873@"。作った訳は次から直接引けるように辞書に入れる
+    if (n >= 3 && s[n - 1] == '@') {
+        int i = n - 2;
+        while (i >= 0 && s[i] >= '0' && s[i] <= '9') i--;
+        if (i >= 0 && i < n - 2 && s[i] == '%') {
+            auto base = g_dict.find(Fnv1a64(s, i));
+            if (base != g_dict.end()) {
+                EnterCriticalSection(&g_cs);
+                std::string& v = g_dict[h];
+                v = base->second;
+                v.append(s + i, n - i);
+                LeaveCriticalSection(&g_cs);
+                return &v;
+            }
+        }
+    }
+    return nullptr;
 }
 
 // ---------------------------------------------------------------- フック
