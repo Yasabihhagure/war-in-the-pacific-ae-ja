@@ -1,14 +1,15 @@
 # War in the Pacific: Admiral's Edition — Japanese Localization (Unofficial)
 
 An unofficial, fan-made Japanese localization for Matrix Games'
-*War in the Pacific: Admiral's Edition*.
+*[War in the Pacific: Admiral's Edition](https://www.matrixgames.com/game/war-in-the-pacific-admirals-edition)*.
 
 - Translates UI text, combat reports, scenario descriptions, and names
   (ships, ship classes, aircraft, places, air groups, ground units,
   leaders and pilots). Japanese ships and aircraft use their Japanese names.
 - The game's files are not modified. You just place files in the game
   folder, and removing them returns the game to English.
-- A legitimately purchased copy of the game is required. This repository
+- A legitimately purchased copy of the game is required
+  ([store page at Matrix Games](https://www.matrixgames.com/game/war-in-the-pacific-admirals-edition)). This repository
   and its downloads contain no original game program, data, or English
   text (translation keys are hash values of the English strings).
 

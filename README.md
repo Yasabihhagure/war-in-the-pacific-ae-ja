@@ -2,13 +2,13 @@
 
 English version: [README.en.md](README.en.md)
 
-Matrix Games の『War in the Pacific: Admiral's Edition』を日本語で遊ぶための、非公式のファンメイド日本語化です。
+Matrix Games の『[War in the Pacific: Admiral's Edition](https://www.matrixgames.com/game/war-in-the-pacific-admirals-edition)』を日本語で遊ぶための、非公式のファンメイド日本語化です。
 
 **ダウンロード: [最新版（Releases）](https://github.com/Yasabihhagure/war-in-the-pacific-ae-ja/releases/latest)**（`witpae-ja-版.zip`）
 
 - 画面の文言、戦闘報告、シナリオの説明文、艦船・艦型・航空機・地名・部隊・人物の名前を日本語にします。日本の艦艇・航空機は日本側の名称です（例: Zeke → 零戦二一型）。
 - ゲームの元ファイルは書き換えません。ゲームのフォルダにファイルを置くだけで日本語になり、外せば英語に戻ります。
-- 遊ぶには、正規に入手したゲーム本体が必要です。このリポジトリと配布物には、原作のプログラム・データ・英文は含まれません。
+- 遊ぶには、正規に入手したゲーム本体が必要です（[Matrix Games の販売ページ](https://www.matrixgames.com/game/war-in-the-pacific-admirals-edition)）。このリポジトリと配布物には、原作のプログラム・データ・英文は含まれません。
 
 ## 画面
 
