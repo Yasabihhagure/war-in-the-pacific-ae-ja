@@ -49,13 +49,44 @@ An unofficial, fan-made Japanese localization for Matrix Games'
 3. Extract the zip into the game folder (where the exe is).
    This places `ddraw.dll`, `witpae_ja.ini`, and the `witpae_ja\`
    folder (translations).
-4. Launch the game as usual. Windowed mode is recommended: create a
-   shortcut to the exe and add ` -w -skipVideo` to the target.
+4. Launch the game as usual. Windowed mode is recommended (see below).
+
+### Recommended: windowed mode
+
+Returning from Alt+Tab in fullscreen can corrupt the display (an issue
+of the original game). Launching in windowed mode avoids it.
+
+- `-w` starts the game in windowed mode; `-skipVideo` skips the intro
+  video (it shows black when the window is enlarged).
+- In windowed mode, the DLL enlarges the window to fit your screen
+  (`[Display]` in `witpae_ja.ini`).
+
+To create the shortcut:
+
+1. In Explorer, right-click `War in the Pacific Admiral Edition.exe`
+   and choose "Create shortcut".
+2. Rename it to something like `WITPAE Windowed`.
+3. Open the shortcut's Properties and append a space and
+   `-w -skipVideo` to the end of "Target" (after the closing quote of
+   `"...\War in the Pacific Admiral Edition.exe"`), then click OK.
+
+Or run this in PowerShell from the game folder to create
+`WITPAE Windowed.lnk`:
+
+```powershell
+$g = (Get-Location).Path
+$s = (New-Object -ComObject WScript.Shell).CreateShortcut("$g\WITPAE Windowed.lnk")
+$s.TargetPath = "$g\War in the Pacific Admiral Edition.exe"
+$s.Arguments = "-w -skipVideo"
+$s.WorkingDirectory = $g
+$s.Save()
+```
 
 ## Uninstall
 
 Delete `ddraw.dll`, `witpae_ja.ini`, `witpae_ja_log.txt`, and the
-`witpae_ja\` folder from the game folder.
+`witpae_ja\` folder from the game folder (and the windowed-mode
+shortcut, if you created one).
 
 ## Known issues / what stays in English
 

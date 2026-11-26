@@ -53,6 +53,23 @@ Matrix Games の『[War in the Pacific: Admiral's Edition](https://www.matrixgam
 - `-w` はウィンドウモード、`-skipVideo` は起動時の動画を飛ばす（ウィンドウを拡大していると動画が黒く映るため）。
 - ウィンドウモードでは、DLL がウィンドウを画面に収まる大きさまで拡大します（`witpae_ja.ini` の `[Display]`）。
 
+ショートカットの作り方:
+
+1. エクスプローラーで `War in the Pacific Admiral Edition.exe` を右クリックし、「ショートカットの作成」を選ぶ。
+2. できたショートカットの名前を `WITPAE Windowed` などに変える（英数字だけの名前にしておくと、英語版の Windows でも文字化けしません）。
+3. ショートカットを右クリックして「プロパティ」を開き、「リンク先」の末尾（`"...\War in the Pacific Admiral Edition.exe"` の後ろ）に半角スペースと `-w -skipVideo` を付けて「OK」。
+
+PowerShell で作る場合は、ゲームのフォルダで次を実行すると `WITPAE Windowed.lnk` ができます。
+
+```powershell
+$g = (Get-Location).Path
+$s = (New-Object -ComObject WScript.Shell).CreateShortcut("$g\WITPAE Windowed.lnk")
+$s.TargetPath = "$g\War in the Pacific Admiral Edition.exe"
+$s.Arguments = "-w -skipVideo"
+$s.WorkingDirectory = $g
+$s.Save()
+```
+
 ## 取り外し
 
 ゲームのフォルダから、次のものを削除すると英語版に戻ります。
@@ -61,6 +78,7 @@ Matrix Games の『[War in the Pacific: Admiral's Edition](https://www.matrixgam
 - `witpae_ja.ini`
 - `witpae_ja_log.txt`
 - `witpae_ja\` フォルダ
+- 作った場合は、ウィンドウモードのショートカット（`WITPAE Windowed.lnk` など）
 
 ## 設定（`witpae_ja.ini`）
 
