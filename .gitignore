@@ -1,0 +1,22 @@
+# 原作の英文・データを含みうるもの（公開しない）
+/work/
+/extract/
+/logs/
+witpae_ja_log.txt
+
+# ビルド結果・配布物
+/src/ddraw/build/
+/dist/
+*.dll
+*.exe
+*.obj
+*.o
+
+# 原作のファイル（万一コピーしても入らないように）
+*.dat
+*.bmp
+*.pws
+*.scn
+
+__pycache__/
+*.pyc
