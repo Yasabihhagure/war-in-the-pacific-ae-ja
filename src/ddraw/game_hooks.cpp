@@ -65,10 +65,14 @@ void WriteJmp(DWORD addr, void* to) {
 // ---------------------------------------------------------------- 日本語の描画
 std::map<int, HFONT> g_jpFonts; // (高さ*2 + 太字) -> フォント
 HDC g_measureDC;
+int g_jpHeightAdjust = 0; // ini [JpFont] HeightAdjust: 日本語の高さの補正 (px)
+int g_jpYOffset = 0;      // ini [JpFont] YOffset: 日本語の上下位置の補正 (px、正で下へ)
 
 HFONT JpFont(void* font) {
     int h = FontHeight(font);
     if (h <= 0 || h > 100) h = 14;
+    h += g_jpHeightAdjust;
+    if (h < 6) h = 6;
     bool bold = FontBold(font);
     int key = h * 2 + (bold ? 1 : 0);
     auto it = g_jpFonts.find(key);
@@ -119,7 +123,7 @@ int DrawSjis(int x, int y, const char* s, int n, void* target) {
     HGDIOBJ old = SelectObject(dc, JpFont(font));
     SetBkMode(dc, TRANSPARENT);
     SetTextColor(dc, RGB((c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff));
-    TextOutW(dc, x, y, w.c_str(), (int)w.size());
+    TextOutW(dc, x, y + g_jpYOffset, w.c_str(), (int)w.size());
     SelectObject(dc, old);
     ((SurfReleaseDC_t)vt[0x68 / 4])(surf, dc);
     static int logged = 0;
@@ -213,6 +217,9 @@ int __cdecl h_Vfmt(char* buf, const char* fmt, va_list va) {
 } // namespace
 
 void InstallGameHooks() {
+    std::string ini = std::string(g_dir) + "witpae_ja.ini";
+    g_jpHeightAdjust = GetPrivateProfileIntA("JpFont", "HeightAdjust", 0, ini.c_str());
+    g_jpYOffset = GetPrivateProfileIntA("JpFont", "YOffset", 0, ini.c_str());
     struct Item { const char* name; DWORD addr; const char* bytes; int copy; void* hook; void** orig; };
     Item items[] = {
         // name       addr        先頭の機械語 (版の確認)         写す長さ  フック            元の関数への入口
