@@ -50,7 +50,7 @@ War in the Pacific: Admiral's Edition の日本語化で、訳文をそろえる
 
 - 文の中に埋め込まれる名前（艦名・地名・部隊名・人名）は `%s` で入るので、訳文では触らない。名前は別の対訳表（`translation/names/`）で訳す。
 - 英文に直接書かれた地名や作戦名は、一般的な日本語表記にする（例: `Pearl Harbor` → `真珠湾`、`Guadalcanal` → `ガダルカナル`、Operation "Watchtower" → ウォッチタワー作戦）。
-- 日本の航空機・艦艇は、日本側の名称にする（例: Zeke → 零戦、Betty → 一式陸攻。対応は作業フォルダの code.md）。
+- 日本の航空機・艦艇は、日本側の名称にする（例: Zeke → 零戦、Betty → 一式陸攻。対応は [aircraft_codes.md](aircraft_codes.md)）。
 - 連合軍の兵器名は、型式を残してカタカナにする（例: `B-17E Fortress` → `B-17E フォートレス`）。
 
 ## 5.1 シナリオの説明文（`translation/scen/`）

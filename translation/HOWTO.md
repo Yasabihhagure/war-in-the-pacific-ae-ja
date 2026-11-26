@@ -4,7 +4,7 @@
 
 ## 用意するもの
 
-- War in the Pacific: Admiral's Edition（インストール済みのもの。既定の場所は `D:\Matrix Games\War in the Pacific Admiral's Edition`。違う場所なら `tools/sheet.py` の `GAME` を直す）
+- War in the Pacific: Admiral's Edition（インストール済みのもの。既定の場所は `D:\Matrix Games\War in the Pacific Admiral's Edition`。違う場所なら、環境変数 `WITPAE_GAME` にゲームのフォルダを入れる。例: Git Bash で `export WITPAE_GAME="C:\Games\War in the Pacific Admiral's Edition"`、PowerShell で `$env:WITPAE_GAME = "C:\Games\..."`）
 - Python 3
 - 表を編集できるもの（テキストエディタ、または表計算ソフト。保存は UTF-8・タブ区切りのまま）
 

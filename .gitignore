@@ -20,3 +20,7 @@ witpae_ja_log.txt
 
 __pycache__/
 *.pyc
+
+# 作業用の計画書・進捗ログと、Claude Code 向けの案内（手元だけで使う。公開用の技術資料は docs/TECHNICAL.md）
+/PLAN.md
+/CLAUDE.md

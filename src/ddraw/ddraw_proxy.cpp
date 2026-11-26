@@ -17,8 +17,8 @@ char g_dir[MAX_PATH];        // ゲームのフォルダ (末尾に \ )
 char g_fontFace[LF_FACESIZE] = "MS Gothic";
 static int  g_fontCharset = SHIFTJIS_CHARSET;
 static int  g_heightAdjust = 0;
-static bool g_replaceFont = true;
-static bool g_logText = true;
+static bool g_replaceFont = false;
+static bool g_logText = false;
 static bool g_translate = true;
 
 static CRITICAL_SECTION g_cs;
@@ -164,8 +164,8 @@ static void LoadIni() {
     GetPrivateProfileStringA("Font", "Face", g_fontFace, g_fontFace, sizeof g_fontFace, ini.c_str());
     g_fontCharset = GetPrivateProfileIntA("Font", "Charset", g_fontCharset, ini.c_str());
     g_heightAdjust = GetPrivateProfileIntA("Font", "HeightAdjust", g_heightAdjust, ini.c_str());
-    g_replaceFont = GetPrivateProfileIntA("Font", "Replace", 1, ini.c_str()) != 0;
-    g_logText = GetPrivateProfileIntA("Debug", "LogText", 1, ini.c_str()) != 0;
+    g_replaceFont = GetPrivateProfileIntA("Font", "Replace", 0, ini.c_str()) != 0;
+    g_logText = GetPrivateProfileIntA("Debug", "LogText", 0, ini.c_str()) != 0;
     g_translate = GetPrivateProfileIntA("Text", "Translate", 1, ini.c_str()) != 0;
 }
 

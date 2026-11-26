@@ -1,8 +1,11 @@
 #!/bin/sh
-# ビルドした DLL と訳文をゲームのフォルダへ配置する（既存の元ファイルには触れない）
+# ビルドした DLL と訳文をゲームのフォルダへ配置する（既存の元ファイルには触れない。開発用）
+# ゲームの場所は環境変数 WITPAE_GAME で変えられる（Windows 形式でも可）
 set -e
-W="/d/ゲーム日本語化/WarInThePacificAdmiralsEdition"
-G="/d/Matrix Games/War in the Pacific Admiral's Edition"
+W="$(cd "$(dirname "$0")/.." && pwd)"
+G="${WITPAE_GAME:-D:/Matrix Games/War in the Pacific Admiral's Edition}"
+command -v cygpath >/dev/null 2>&1 && G="$(cygpath -u "$G")"
+[ -f "$G/War in the Pacific Admiral Edition.exe" ] || { echo "ゲームが見つからない: $G（WITPAE_GAME で指定する）"; exit 1; }
 cp "$W/src/ddraw/build/ddraw.dll" "$G/ddraw.dll"
 [ -f "$G/witpae_ja.ini" ] || cp "$W/witpae_ja.ini" "$G/witpae_ja.ini"
 mkdir -p "$G/witpae_ja/names"

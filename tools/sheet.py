@@ -25,7 +25,8 @@ import sys
 import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GAME = r"D:\Matrix Games\War in the Pacific Admiral's Edition"
+# ゲームの場所。環境変数 WITPAE_GAME で変えられる (Windows 形式のパス)
+GAME = os.environ.get("WITPAE_GAME") or r"D:\Matrix Games\War in the Pacific Admiral's Edition"
 EXE = os.path.join(GAME, "War in the Pacific Admiral Edition.exe")
 LOG = os.path.join(GAME, "witpae_ja_log.txt")
 JA = os.path.join(ROOT, "translation", "ja.tsv")
