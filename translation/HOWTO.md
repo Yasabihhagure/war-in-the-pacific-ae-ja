@@ -21,6 +21,7 @@
 1. `python tools/names.py export` を実行すると、`work/names/<種類>.tsv` ができる。種類は ships（艦船）、ship_classes（艦型）、aircraft（航空機）、places（地名）、air_groups（航空隊）、ground_units（地上部隊）、leaders（指揮官）、pilots（パイロット）。列は `key`、`english`、`ja`、`memo`、`count`（出てくるシナリオの数）。
 2. `ja` を直す。日本語は Shift_JIS（CP932）で 19 バイト（全角 9 文字）以内。`~` と `%` は使えない。
 3. `python tools/names.py import` で `translation/names/<種類>.tsv` に書き戻す。
+4. `python tools/names.py aliases` を実行する。末尾に空白のある名前（`Aoba-1 ` など）の訳を、空白を落とした形（`Aoba-1`）のキーにも入れる（メモは「別名: 末尾の空白なし」。元の訳を直したら、これで作り直される）。ゲームは空白つきのまま描くが、空白を落として引く道具でも引けるようにするため。
 
 注意:
 

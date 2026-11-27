@@ -19,6 +19,7 @@
   python tools/names.py persons            # 姓の訳から leaders / pilots の訳 (姓の訳 + 頭文字) を組み立てる
   python tools/names.py surname-export     # 編集用の姓の表 work/names/surnames.tsv (英語つき) を作る
   python tools/names.py surname-import     # 編集用の姓の表を translation/surnames.tsv に書き戻し、人名を組み立て直す
+  python tools/names.py aliases            # 末尾に空白のある名前の訳を、空白なしの形のキーにも入れる (訳を足したあとに実行)
 """
 import glob
 import os
@@ -192,7 +193,20 @@ KEEP_RE = {
         _ORD + r" [A-Z]{2,5}/" + _ORD + r" [A-Z]{2,5}( [A-Z]{2,4})?"   # 93rd BG/329th BS
         r"|\d?/?V[A-Z]{1,4}-\d+[A-Z]?(/\d)?"                          # VF-3, 1/VCS-13
         r"|\d+ [A-Za-z]+-?[A-Za-z]*/\d+ [A-Za-z]+"                    # 316 ShAD/336 ShAP
-        r"|[A-Z0-9 ./*-]+"),                                          # 見出し
+        r"|(Det/)?\d?/?V[A-Z]{1,4}(\([A-Z]+\))*-\d+"                  # VC(F)-10, VMF(CVS)(P)-514, Det/VP-45
+        r"( Det( \d+| [A-Z])?| [A-Z][a-z]+ Det)?"                     #   VP-23 Det 1, VJ-10 Det A, VS-70 Sitka Det
+        r"|" + _ORD + r" [A-Z]{2,5}( \([A-Z]\))?( Det)?"              # 12th PRS, 13rd PS (P), 18th PMS Det
+        r"|" + _ORD + r" [A-Z]{2,5}/(Hq Sqn|HqS|" + _ORD + r" [A-Z]{2,5} Det)"  # 11th BG/Hq Sqn, 7th BG/9th BS Det
+        r"|" + _ORD + r" ?[A-Za-z]{2,5}/" + _ORD + r" ?[A-Za-z]{2,5}( \(C\)| Cdo)?"  # 1st ACG/6th FS (C), 49thFG/7th FS
+        r"|" + _ORD + r" [A-Z]{2,5}/(BS|FS|TS)( \(Comp\))?|\d+ [A-Z]+/\d+ (Gv )?[A-Z]+(-TOF)?"  # 5318th PAU/BS
+        r"|" + _ORD + r" [A-Z]{2,5}/Hq sqn|" + _ORD + r" [A-Z][a-z]?S( Det)?"         # 8th PhS Det
+        r"|\d?e?-?\d-V[Il]\.G[.-][IV]+( Groep)?"                     # 2e-1-VI.G-V Groep (オランダ)
+        r"|" + _ORD + r" (Sqd|BS|PS|PhS|OS) PAAC"                     # 10th Sqd PAAC
+        r"|\d+ [A-Z]+/\d+ [A-Za-z]+-[A-Z]+|" + _ORD + r" [A-Z]{2}/\d+ th [A-Z]{2}"  # 4 MTAP/29 BABr-TOF, 457th BG/789 th BS
+        r"|.*\*\*.*|NavTeam Slot \w+|\S{1,2}|.*[!{].*"               # データのごみ (USN Landbased****** など)
+        r"|\d+(st|nd|rd|th)? AAFBU"                                   # 1345th AAFBU
+        r"|\d?-?V[kl]\.[AG]([.-][IV]+|[.-]\d)?|D\.V[kl]\.A"           # 1-Vl.G-I, Vk.A-1 (オランダ)
+        r"|(?!I\.\d+-\d+$)[A-Z0-9 ./*-]+"),                           # 見出し (伊号潜の I.7-1 は除く)
     "ground_units": re.compile(r"[A-Z0-9 ./*-]+"),
 }
 
@@ -503,6 +517,37 @@ def compose_persons():
     do_import()
 
 
+ALIAS_MEMO = "別名: 末尾の空白なし"
+
+
+def add_trim_aliases():
+    """末尾に空白のある名前 ("Aoba-1 ") の訳を、空白を落とした形 ("Aoba-1") のキーにも入れる。
+    ゲームはデータの名前を空白つきのまま描くが、空白を落として引く道具 (サポートツールなど) でも引けるように。
+    すでに訳のあるキーは変えない (この関数が作った別名は、元の訳に合わせて作り直す)。メモは ALIAS_MEMO"""
+    for kind, (prefix, desc) in KINDS.items():
+        pub = read_pub(kind)
+        seen = set()
+        n = 0
+        for path in sorted(glob.glob(os.path.join(SCEN, prefix + "*.dat"))):
+            for b in names_in(path):
+                if b in seen:
+                    continue
+                seen.add(b)
+                t = b.rstrip(b" ")
+                ja = pub.get(sheet.key_of(b), ("", ""))[0]
+                if t == b or not t or not ja:
+                    continue
+                kt = sheet.key_of(t)
+                old = pub.get(kt, ("", ""))
+                if old[0] and old[1] != ALIAS_MEMO or old == (ja, ALIAS_MEMO):
+                    continue
+                pub[kt] = (ja, ALIAS_MEMO)
+                n += 1
+        if n:
+            write_pub(kind, pub)
+        print("%-13s %d aliases" % (kind, n))
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # 日本語を含む結果の表示で止まらないように
     cmd = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -535,6 +580,8 @@ def main():
         surname_export()
     elif cmd == "surname-import":
         surname_import()
+    elif cmd == "aliases":
+        add_trim_aliases()
     else:
         print(__doc__)
 
